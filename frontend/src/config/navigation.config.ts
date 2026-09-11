@@ -98,6 +98,7 @@ export const ROLE_NAVIGATION: RoleNavigation = {
       items: [
         { title: 'Hostel Complaints', href: '/warden/complaints', iconName: 'Wrench' },
         { title: 'Facility Assets', href: '/warden/facilities', iconName: 'Box' },
+        { title: 'AI Knowledge Base', href: '/warden/knowledge-base', iconName: 'BookOpen' },
         { title: 'Campus Notices', href: '/announcements', iconName: 'Megaphone' },
         { title: 'Notifications', href: '/notifications', iconName: 'Bell' },
       ],

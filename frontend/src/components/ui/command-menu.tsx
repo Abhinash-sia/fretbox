@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import { Command as CommandPrimitive } from 'cmdk';
-import { Search } from 'lucide-react';
+import { Search, Sparkles } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { useAiDrawer } from '@/features/ai/context/ai-drawer-context';
 
 interface CommandMenuProps {
   open: boolean;
@@ -12,6 +13,7 @@ interface CommandMenuProps {
 }
 
 export function CommandMenu({ open, onOpenChange, onSelectAction }: CommandMenuProps) {
+  const { openDrawer: openAiDrawer } = useAiDrawer();
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -45,6 +47,18 @@ export function CommandMenu({ open, onOpenChange, onSelectAction }: CommandMenuP
             <CommandPrimitive.Empty className="py-6 text-center text-xs text-muted-foreground">
               No results found.
             </CommandPrimitive.Empty>
+            <CommandPrimitive.Group heading="Campus AI Assistant" className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <CommandPrimitive.Item
+                onSelect={() => {
+                  onOpenChange(false);
+                  openAiDrawer();
+                }}
+                className="relative flex cursor-pointer select-none items-center gap-2 rounded-xs px-2 py-1.5 text-xs outline-none hover:bg-accent hover:text-accent-foreground aria-selected:bg-accent aria-selected:text-accent-foreground text-primary font-medium"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                <span>Ask Campus AI Assistant</span>
+              </CommandPrimitive.Item>
+            </CommandPrimitive.Group>
             <CommandPrimitive.Group heading="Quick Navigation" className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               <CommandPrimitive.Item
                 onSelect={() => handleSelect('/student/dashboard')}

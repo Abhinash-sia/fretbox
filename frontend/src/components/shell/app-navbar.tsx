@@ -10,6 +10,7 @@ import {
   LogOut,
   Shield,
   Menu,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,6 +33,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/components/providers/auth-provider';
 import { UserRole } from '@/config/navigation.config';
 import { NotificationBell } from '@/features/communication/components/notification-bell';
+import { useAiDrawer } from '@/features/ai/context/ai-drawer-context';
 
 interface AppNavbarProps {
   currentRole?: UserRole;
@@ -45,6 +47,7 @@ export function AppNavbar({
 }: AppNavbarProps) {
   const { theme, setTheme } = useTheme();
   const { user, role, logout } = useAuth();
+  const { openDrawer: openAiDrawer } = useAiDrawer();
   const activeRole = role || 'student';
 
   const userInitials = user?.name
@@ -87,6 +90,17 @@ export function AppNavbar({
 
       {/* 2. Right: Command Search, Notifications, Theme & Profile */}
       <div className="flex items-center gap-2">
+        {/* Ask Campus AI Assistant Trigger */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => openAiDrawer()}
+          className="h-8 gap-1.5 text-xs font-medium border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
+        >
+          <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+          <span className="hidden md:inline">Ask Campus AI</span>
+        </Button>
+
         {/* Command Search Trigger */}
         <button
           onClick={onOpenCommand}

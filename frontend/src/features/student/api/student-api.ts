@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/api/api-client';
+import { aiApi } from '@/features/ai/api/ai-api';
 import {
   StudentAttendanceSummary,
   HostelRoomAllocation,
@@ -103,9 +104,7 @@ export const studentApi = {
 
   // 7. AI FAQ Query
   async queryFaq(query: string): Promise<FaqQueryResponse> {
-    return apiClient.request<FaqQueryResponse>('/faq/query', {
-      method: 'POST',
-      body: { query },
-    });
+    const result = await aiApi.queryFaq({ question: query });
+    return result as unknown as FaqQueryResponse;
   },
 };
