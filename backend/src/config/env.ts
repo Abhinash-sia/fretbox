@@ -23,6 +23,11 @@ export const envSchema = z.object({
   GEMINI_MODEL: z.string().default('gemini-2.5-flash'),
   AI_COMPLAINT_CONFIDENCE_THRESHOLD: z.coerce.number().min(0).max(1).default(0.8),
   AI_AUTO_APPLY: z.coerce.boolean().default(false),
+  AI_SERVICE_URL: z.string().default('http://localhost:8000'),
+  PREDICTION_SERVICE_TIMEOUT_MS: z.coerce.number().default(5000),
+  PREDICTION_DEFAULT_HISTORY_DAYS: z.coerce.number().default(180),
+  PREDICTION_DEFAULT_HORIZON_DAYS: z.coerce.number().default(7),
+  PREDICTION_MAX_HORIZON_DAYS: z.coerce.number().default(30),
 });
 
 /**

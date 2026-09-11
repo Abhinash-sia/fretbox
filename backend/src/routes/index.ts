@@ -11,6 +11,7 @@ import gateEventRoutes from './gateEvent.routes.js';
 import communicationRoutes from './communication.routes.js';
 import analyticsRoutes from './analytics.routes.js';
 import faqRoutes from './faq.routes.js';
+import predictionRoutes from './prediction.routes.js';
 
 const apiV1Router = Router();
 
@@ -26,6 +27,7 @@ apiV1Router.use('/gate-passes', gatePassRoutes);
 apiV1Router.use('/gate-events', gateEventRoutes);
 apiV1Router.use('/communication', communicationRoutes);
 apiV1Router.use('/admin/analytics', analyticsRoutes);
+apiV1Router.use('/admin/predictions', predictionRoutes);
 apiV1Router.use('/faq', faqRoutes);
 
 export default apiV1Router;

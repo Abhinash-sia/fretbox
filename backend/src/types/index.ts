@@ -299,6 +299,11 @@ export interface AppConfig {
   GEMINI_MODEL?: string;
   AI_COMPLAINT_CONFIDENCE_THRESHOLD?: number;
   AI_AUTO_APPLY?: boolean;
+  AI_SERVICE_URL?: string;
+  PREDICTION_SERVICE_TIMEOUT_MS?: number;
+  PREDICTION_DEFAULT_HISTORY_DAYS?: number;
+  PREDICTION_DEFAULT_HORIZON_DAYS?: number;
+  PREDICTION_MAX_HORIZON_DAYS?: number;
 }
 
 export interface JWTPayload {

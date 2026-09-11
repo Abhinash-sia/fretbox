@@ -1,4 +1,4 @@
-# Fretbox Backend Architecture — Phase B8 (Campus FAQ & RAG Domain)
+# Fretbox Backend Architecture — Phase B9 (Demand Prediction & Forecasting Domain)
 
 ## Architectural Overview
 
@@ -279,3 +279,42 @@ Validation & Formatting (Verify output, format response with sources & confidenc
 - **Access Control**:
   - `POST /api/v1/faq/documents` & `PATCH /api/v1/faq/documents/:id`: Restrictable to `ADMINISTRATOR` and `WARDEN`.
   - `GET /api/v1/faq/query`: Open to authenticated users (`STUDENT`, `FACULTY`, `STAFF`, `WARDEN`, `ADMINISTRATOR`) with automatic role-based document scoping.
+
+---
+
+## Phase B9 — Demand Prediction & Forecasting Architecture
+
+### 1. Data & Prediction Flow
+```
+MongoDB Complaint History (`createdAt` timestamps)
+        │
+        ▼
+Node.js Express Gateway (`GET /api/v1/admin/predictions/complaints`)
+  ├── 1. RBAC Check (Role: ADMINISTRATOR only)
+  ├── 2. Query Validation (Zod predictionQuerySchema)
+  └── 3. Aggregation Pipeline (Daily complaint totals for history window)
+        │
+        ▼
+PredictionService (`src/services/prediction.service.ts`)
+        │ HTTP POST /predict (Payload: { horizonDays, historyDays, records })
+        ▼
+Python AI Microservice (`ai-service/app/main.py`)
+  ├── 1. Continuous Time Series Generation (Zero-filling missing date gaps)
+  ├── 2. Feature Engineering (day_of_week, day_of_month, month, is_weekend, lag_1, lag_7, rolling_mean_7, rolling_mean_14)
+  ├── 3. Chronological Train/Test Split (80% Train, 20% Test)
+  ├── 4. Baseline Evaluation (7-day Seasonal Naive Forecast)
+  ├── 5. ML Model Training & Evaluation (RandomForestRegressor, random_state=42)
+  ├── 6. Model Selection (Choose RandomForestRegressor if MAE <= Baseline MAE)
+  └── 7. Iterative Multi-step Forecast & Metric Output
+        │
+        ▼
+Node Response Validation (Zod pythonPredictionResponseSchema)
+        │
+        ▼
+Admin JSON API Output ({ status, forecast, model, baseline, selectedModel })
+```
+
+### 2. Safeguards & Resilience
+- **No Data Leakage**: Lags and rolling statistics are calculated strictly using past observations.
+- **Data Minimum Check**: Requires $\ge 30$ continuous daily observations (`status: "insufficient_data"` if sparse).
+- **Graceful Unavailability Fallback**: Returns `503 PREDICTION_SERVICE_UNAVAILABLE` without crashing Node backend if Python service is offline or times out (5000ms).

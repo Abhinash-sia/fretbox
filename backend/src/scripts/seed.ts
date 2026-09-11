@@ -588,6 +588,48 @@ async function seed() {
       logger.info('Seeded Approved Campus FAQ Knowledge Documents');
     }
 
+    // 17. Seed Continuous Historical Complaint Data for B9 Demand Prediction (45+ days)
+    const existingComplaintCount = await Complaint.countDocuments();
+    if (existingComplaintCount < 10) {
+      const historicalComplaints = [];
+      const baseDate = new Date();
+      baseDate.setHours(10, 0, 0, 0);
+
+      const categories = Object.values(ComplaintCategory);
+      const priorities = Object.values(ComplaintPriority);
+      const statuses = Object.values(ComplaintStatus);
+
+      for (let dayOffset = 50; dayOffset >= 1; dayOffset--) {
+        const targetDate = new Date(baseDate.getTime() - dayOffset * 24 * 60 * 60 * 1000);
+        // Generate pseudo-random complaint volume between 2 and 8 per day with seasonal weekly pattern
+        const dayOfWeek = targetDate.getDay();
+        const baseVolume = dayOfWeek === 0 || dayOfWeek === 6 ? 2 : 5; // Higher on weekdays
+        const complaintCountForDay = baseVolume + (dayOffset % 3);
+
+        for (let c = 0; c < complaintCountForDay; c++) {
+          const category = categories[(dayOffset + c) % categories.length];
+          const priority = priorities[(dayOffset + c) % priorities.length];
+          const status = statuses[(dayOffset + c) % statuses.length];
+
+          historicalComplaints.push({
+            ticketNumber: `FBX-HIST-${dayOffset}-${c}`,
+            studentId: student1Id,
+            createdBy: student1Id,
+            title: `Historical ${category} issue #${c + 1}`,
+            description: `Automated historical complaint for day -${dayOffset} testing prediction engine.`,
+            category,
+            priority,
+            status,
+            createdAt: targetDate,
+            updatedAt: targetDate,
+          });
+        }
+      }
+
+      await Complaint.insertMany(historicalComplaints);
+      logger.info('Seeded Continuous Historical Complaint Data (50 days) for B9 Demand Prediction');
+    }
+
     logger.info('Seed completed successfully! Log in using student@fretbox.demo / Password123!');
   } catch (err) {
     logger.error({ err }, 'Error running seed script');

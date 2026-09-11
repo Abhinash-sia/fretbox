@@ -1,6 +1,6 @@
-# Fretbox Backend — Phase B8 (Campus FAQ / RAG Domain)
+# Fretbox Backend — Phase B9 (Demand Prediction & Forecasting Domain)
 
-Unified Campus Operations Platform — Backend Foundation, Authentication, RBAC, Academic Master Data, Attendance, Hostels, Facilities, Complaints, Mess Management, Gate Pass, Real-Time Communication, Admin Intelligence, AI Complaint Classification, and Campus FAQ / RAG Assistant.
+Unified Campus Operations Platform — Backend Foundation, Authentication, RBAC, Academic Master Data, Attendance, Hostels, Facilities, Complaints, Mess Management, Gate Pass, Real-Time Communication, Admin Intelligence, AI Complaint Classification, Campus FAQ / RAG Assistant, and Demand Prediction & Forecasting.
 
 ## Tech Stack
 
@@ -190,3 +190,6 @@ Run `npm run seed` to populate demo accounts, academic data, hostels, blocks, ro
 - `GET /api/v1/faq/documents` - List campus knowledge documents with category/role filtering (All authenticated users)
 - `POST /api/v1/faq/documents` - Create new campus knowledge document (Admin, Warden)
 - `PATCH /api/v1/faq/documents/:id` - Update existing campus knowledge document (Admin, Warden)
+
+### Demand Prediction & Forecasting (`/api/v1/admin/predictions`)
+- `GET /api/v1/admin/predictions/complaints?horizonDays=7&historyDays=180` - Generate evaluated ML forecast of complaint volume comparing Random Forest vs 7-day seasonal naive baseline (Administrator only)
