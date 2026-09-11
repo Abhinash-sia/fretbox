@@ -1,5 +1,11 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { ComplaintCategory, ComplaintPriority, ComplaintStatus } from '../types/index.js';
+import {
+  ComplaintCategory,
+  ComplaintPriority,
+  ComplaintStatus,
+  AiClassificationStatus,
+  IAiClassification,
+} from '../types/index.js';
 
 export interface IComplaint {
   ticketNumber: string;
@@ -23,6 +29,7 @@ export interface IComplaint {
   resolutionNote?: string;
   resolutionNotes?: string;
   resolutionTimeMinutes?: number;
+  aiClassification?: IAiClassification;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -126,6 +133,40 @@ const complaintSchema = new Schema<IComplaintDocument>(
     },
     resolutionTimeMinutes: {
       type: Number,
+    },
+    aiClassification: {
+      category: {
+        type: String,
+        enum: Object.values(ComplaintCategory),
+      },
+      priority: {
+        type: String,
+        enum: Object.values(ComplaintPriority),
+      },
+      confidence: {
+        type: Number,
+        min: 0,
+        max: 1,
+      },
+      reason: {
+        type: String,
+        trim: true,
+      },
+      provider: {
+        type: String,
+        trim: true,
+      },
+      model: {
+        type: String,
+        trim: true,
+      },
+      status: {
+        type: String,
+        enum: Object.values(AiClassificationStatus),
+      },
+      classifiedAt: {
+        type: Date,
+      },
     },
   },
   {

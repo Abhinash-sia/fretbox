@@ -13,7 +13,10 @@ import {
   NotFoundError,
   ForbiddenError,
   BadRequestError,
+  AiClassificationStatus,
+  AuthUserContext,
 } from '../types/index.js';
+import { ComplaintClassificationService } from './ai/complaint-classification.service.js';
 
 export class ComplaintService {
   private generateTicketNumber(): string {
@@ -43,22 +46,22 @@ export class ComplaintService {
 
     const complaint = await Complaint.create({
       ticketNumber,
-      studentId: data.studentId,
+      studentId: new Types.ObjectId(data.studentId),
       title: data.title.trim(),
       description: data.description.trim(),
       category: data.category,
       priority: data.priority || ComplaintPriority.MEDIUM,
       status: ComplaintStatus.OPEN,
-      hostelId: data.hostelId,
-      blockId: data.blockId,
-      roomId: data.roomId,
-      assetId: data.assetId,
+      hostelId: data.hostelId ? new Types.ObjectId(data.hostelId) : undefined,
+      blockId: data.blockId ? new Types.ObjectId(data.blockId) : undefined,
+      roomId: data.roomId ? new Types.ObjectId(data.roomId) : undefined,
+      assetId: data.assetId ? new Types.ObjectId(data.assetId) : undefined,
       preferredTimeSlot: data.preferredTimeSlot?.trim(),
     });
 
     await ComplaintAudit.create({
       complaintId: complaint._id,
-      performedByUserId: data.studentId,
+      performedByUserId: new Types.ObjectId(data.studentId),
       action: ComplaintAuditAction.CREATED,
       newStatus: ComplaintStatus.OPEN,
       notes: 'Complaint registered',
@@ -378,5 +381,77 @@ export class ComplaintService {
 
     const recurring = await Complaint.aggregate(pipeline);
     return recurring;
+  }
+
+  public async classifyComplaintWithAi(
+    complaintId: string,
+    userContext: AuthUserContext,
+  ): Promise<IComplaint> {
+    const complaint = await Complaint.findById(complaintId);
+    if (!complaint) {
+      throw new NotFoundError('Complaint not found', 'COMPLAINT_NOT_FOUND');
+    }
+
+    // Ownership / Scope validation
+    if (userContext.role === UserRole.STUDENT) {
+      const studentIdStr = (complaint.studentId || complaint.createdBy)?.toString();
+      if (studentIdStr !== userContext.id) {
+        throw new ForbiddenError('Students can only classify their own complaints');
+      }
+    }
+
+    const aiService = new ComplaintClassificationService();
+    const classification = await aiService.classify({
+      title: complaint.title,
+      description: complaint.description,
+    });
+
+    complaint.aiClassification = classification;
+    await complaint.save();
+
+    await ComplaintAudit.create({
+      complaintId: complaint._id,
+      performedByUserId: new Types.ObjectId(userContext.id),
+      action: ComplaintAuditAction.AI_CLASSIFIED,
+      notes: `AI classification run (${classification.status}): category=${classification.category}, priority=${classification.priority}, confidence=${classification.confidence}`,
+    });
+
+    return complaint;
+  }
+
+  public async applyAiClassification(
+    complaintId: string,
+    userContext: AuthUserContext,
+    override?: { category?: ComplaintCategory; priority?: ComplaintPriority },
+  ): Promise<IComplaint> {
+    const complaint = await Complaint.findById(complaintId);
+    if (!complaint) {
+      throw new NotFoundError('Complaint not found', 'COMPLAINT_NOT_FOUND');
+    }
+
+    if (!complaint.aiClassification) {
+      throw new BadRequestError('Complaint has not been classified by AI yet');
+    }
+
+    const newCategory = override?.category || complaint.aiClassification.category;
+    const newPriority = override?.priority || complaint.aiClassification.priority;
+
+    const oldCategory = complaint.category;
+    const oldPriority = complaint.priority;
+
+    complaint.category = newCategory;
+    complaint.priority = newPriority;
+    complaint.aiClassification.status = AiClassificationStatus.APPLIED;
+
+    await complaint.save();
+
+    await ComplaintAudit.create({
+      complaintId: complaint._id,
+      performedByUserId: new Types.ObjectId(userContext.id),
+      action: ComplaintAuditAction.AI_APPLIED,
+      notes: `Applied AI recommendation: category (${oldCategory} -> ${newCategory}), priority (${oldPriority} -> ${newPriority})`,
+    });
+
+    return complaint;
   }
 }

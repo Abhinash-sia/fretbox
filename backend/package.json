@@ -13,6 +13,7 @@
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:ai": "vitest run tests/ai.service.test.ts",
     "seed": "tsx src/scripts/seed.ts"
   },
   "keywords": [
@@ -28,6 +29,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^2.22.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

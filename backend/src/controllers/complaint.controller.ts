@@ -148,3 +148,27 @@ export const getRecurringIssues = async (req: Request, res: Response, next: Next
     next(err);
   }
 };
+
+export const classifyComplaintWithAi = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) throw new UnauthorizedError();
+    const complaint = await complaintService.classifyComplaintWithAi(req.params.id!, req.user);
+    sendSuccess(res, complaint, 200, 'AI classification requested successfully');
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const applyAiClassification = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) throw new UnauthorizedError();
+    const complaint = await complaintService.applyAiClassification(
+      req.params.id!,
+      req.user,
+      req.body,
+    );
+    sendSuccess(res, complaint, 200, 'AI recommendation applied successfully');
+  } catch (err) {
+    next(err);
+  }
+};

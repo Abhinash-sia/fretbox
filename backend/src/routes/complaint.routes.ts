@@ -7,6 +7,8 @@ import {
   updateComplaintStatus,
   getComplaintMetrics,
   getRecurringIssues,
+  classifyComplaintWithAi,
+  applyAiClassification,
 } from '../controllers/complaint.controller.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
 import { authorize } from '../middlewares/rbac.middleware.js';
@@ -17,6 +19,7 @@ import {
   assignComplaintSchema,
   updateComplaintStatusSchema,
 } from '../utils/b3.schemas.js';
+import { aiApplyClassificationSchema } from '../utils/b7.schemas.js';
 
 const router = Router();
 
@@ -35,6 +38,13 @@ router.get(
   getRecurringIssues,
 );
 router.get('/:id', getComplaintById);
+router.post('/:id/ai-classify', classifyComplaintWithAi);
+router.post(
+  '/:id/ai-apply',
+  authorize(UserRole.ADMINISTRATOR, UserRole.WARDEN),
+  validate(aiApplyClassificationSchema),
+  applyAiClassification,
+);
 router.patch(
   '/:id/assign',
   authorize(UserRole.ADMINISTRATOR, UserRole.WARDEN),

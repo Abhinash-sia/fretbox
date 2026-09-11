@@ -103,6 +103,27 @@ export enum ComplaintAuditAction {
   RESOLVED = 'resolved',
   CLOSED = 'closed',
   REOPENED = 'reopened',
+  AI_CLASSIFIED = 'ai_classified',
+  AI_APPLIED = 'ai_applied',
+}
+
+export enum AiClassificationStatus {
+  UNAVAILABLE = 'unavailable',
+  CLASSIFIED = 'classified',
+  NEEDS_REVIEW = 'needs_review',
+  APPLIED = 'applied',
+  FAILED = 'failed',
+}
+
+export interface IAiClassification {
+  category: ComplaintCategory;
+  priority: ComplaintPriority;
+  confidence: number;
+  reason: string;
+  provider: string;
+  model: string;
+  status: AiClassificationStatus;
+  classifiedAt: Date;
 }
 
 export enum MealType {
@@ -251,6 +272,10 @@ export interface AppConfig {
   JWT_REFRESH_SECRET: string;
   JWT_ACCESS_EXPIRES_IN: string;
   JWT_REFRESH_EXPIRES_IN: string;
+  GEMINI_API_KEY?: string;
+  GEMINI_MODEL?: string;
+  AI_COMPLAINT_CONFIDENCE_THRESHOLD?: number;
+  AI_AUTO_APPLY?: boolean;
 }
 
 export interface JWTPayload {

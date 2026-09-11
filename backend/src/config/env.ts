@@ -19,6 +19,10 @@ export const envSchema = z.object({
     .default('dev_refresh_secret_fretbox_2026_super_secure_key_456_change_in_production'),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default('gemini-2.5-flash'),
+  AI_COMPLAINT_CONFIDENCE_THRESHOLD: z.coerce.number().min(0).max(1).default(0.8),
+  AI_AUTO_APPLY: z.coerce.boolean().default(false),
 });
 
 /**
