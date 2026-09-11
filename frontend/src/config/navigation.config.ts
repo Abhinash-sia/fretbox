@@ -78,6 +78,7 @@ export const ROLE_NAVIGATION: RoleNavigation = {
         { title: 'Dashboard', href: '/staff/dashboard', iconName: 'LayoutDashboard' },
         { title: 'Assigned Complaints', href: '/staff/complaints', iconName: 'Wrench' },
         { title: 'Facility Inspection', href: '/staff/facilities', iconName: 'Box' },
+        { title: 'Notifications', href: '/notifications', iconName: 'Bell' },
       ],
     },
   ],
@@ -97,6 +98,8 @@ export const ROLE_NAVIGATION: RoleNavigation = {
       items: [
         { title: 'Hostel Complaints', href: '/warden/complaints', iconName: 'Wrench' },
         { title: 'Facility Assets', href: '/warden/facilities', iconName: 'Box' },
+        { title: 'Campus Notices', href: '/announcements', iconName: 'Megaphone' },
+        { title: 'Notifications', href: '/notifications', iconName: 'Bell' },
       ],
     },
   ],

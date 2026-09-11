@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { useTheme } from 'next-themes';
 import {
-  Bell,
   Sun,
   Moon,
   Search,
@@ -32,6 +31,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/components/providers/auth-provider';
 import { UserRole } from '@/config/navigation.config';
+import { NotificationBell } from '@/features/communication/components/notification-bell';
 
 interface AppNavbarProps {
   currentRole?: UserRole;
@@ -112,15 +112,7 @@ export function AppNavbar({
         </Button>
 
         {/* Notifications Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative h-8 w-8 text-muted-foreground hover:text-foreground"
-        >
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-background" />
-          <span className="sr-only">Notifications</span>
-        </Button>
+        <NotificationBell />
 
         <div className="h-4 w-px bg-border mx-1 hidden sm:block" />
 
