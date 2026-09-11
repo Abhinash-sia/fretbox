@@ -160,3 +160,14 @@ Run `npm run seed` to populate demo accounts, academic data, hostels, blocks, ro
 - `POST /api/v1/mess/menus/:id/feedback` - Submit meal rating & review (Student)
 - `GET /api/v1/mess/menus/:id/feedback/summary` - Get meal feedback summary & rating distribution
 - `GET /api/v1/mess/menus/:id/feedback` - List meal feedback reviews (Admin, Warden, Staff)
+
+### Gate Passes & Security (`/api/v1/gate-passes` & `/api/v1/gate-events`)
+- `POST /api/v1/gate-passes` - Apply for gate pass (Student)
+- `GET /api/v1/gate-passes` - List gate passes (Student scoped to own; Warden/Security/Admin filter all)
+- `GET /api/v1/gate-passes/:id` - Get gate pass details
+- `POST /api/v1/gate-passes/:id/cancel` - Cancel pending gate pass (Student owner)
+- `PATCH /api/v1/gate-passes/:id/approve` - Approve gate pass & issue 32-byte QR token (Warden, Admin)
+- `PATCH /api/v1/gate-passes/:id/reject` - Reject gate pass request (Warden, Admin)
+- `POST /api/v1/gate-passes/scan` - Security QR scan & atomic pass consumption (Security, Admin)
+- `GET /api/v1/gate-events` - List security gate scan audit events (Security, Warden, Admin)
+- `GET /api/v1/gate-events/:id` - Get gate scan event details (Security, Warden, Admin)

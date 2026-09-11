@@ -1,8 +1,8 @@
-# Fretbox Backend Architecture — Phase B3 (Operations Domain)
+# Fretbox Backend Architecture — Phase B4 (Gate Pass & Security Domain)
 
 ## Architectural Overview
 
-Fretbox backend follows a modular, layer-separated architecture designed for high scalability, testability, and clear domain boundaries across Academic and Operations domains.
+Fretbox backend follows a modular, layer-separated architecture designed for high scalability, testability, and clear domain boundaries across Academic, Operations, and Gate Pass/Security domains.
 
 ### Request Flow Diagram
 
@@ -25,19 +25,85 @@ RBAC Authorization Middleware (`authorize(...roles)`) ──► 403 Forbidden
 Route Handler & Zod Validation Middleware (`validate`)
     │
     ▼
-Controller Layer (`hostel.controller.ts`, `facility.controller.ts`, `complaint.controller.ts`, `mess.controller.ts`)
+Controller Layer (`gatePass.controller.ts`, `gateEvent.controller.ts`, `hostel.controller.ts`, `complaint.controller.ts`, etc.)
     │
     ▼
-Service Layer (`hostel.service.ts`, `facility.service.ts`, `complaint.service.ts`, `mess.service.ts`)
+Service Layer (`gatePass.service.ts`, `gateEvent.service.ts`, `hostel.service.ts`, etc.)
     │
     ▼
-Mongoose Model Layer (`Hostel`, `HostelBlock`, `Room`, `StudentRoomAllocation`,
-                      `FacilityAsset`, `Complaint`, `ComplaintAssignment`, `ComplaintAudit`,
-                      `MessMenu`, `MessFeedback`)
+Mongoose Model Layer (`GatePass`, `GateEvent`, `Hostel`, `Room`, `Complaint`, `User`, etc.)
     │
     ▼
 MongoDB Database (`fretbox` database on localhost:27017)
 ```
+
+---
+
+## Phase B4 Gate Pass & Security Domain Architecture
+
+### 1. Gate Pass Lifecycle & State Model
+```
+Student Request (PENDING) ──► Warden Approval ──► Token Generated (APPROVED) ──► Security Scan Verification (USED)
+       │                              │
+       ▼                              ▼
+  Student Cancel (CANCELLED)   Warden Reject (REJECTED)
+```
+
+#### Pass Status Transitions
+- `PENDING` ──► `APPROVED` (by Warden/Admin), `REJECTED` (by Warden/Admin), or `CANCELLED` (by Student owner)
+- `APPROVED` ──► `USED` (consumed upon valid Security scan), `EXPIRED` (if past expected return time without scan)
+
+### 2. Cryptographic Token & Hash Architecture
+```
+Warden Approves Pass
+     │
+     ▼
+Generate 32-byte Hex Token (`crypto.randomBytes(32).toString('hex')`)
+     │
+     ├──────────► SHA-256 Hashing (`crypto.createHash('sha256').update(rawToken).digest('hex')`)
+     │                │
+     │                ▼
+     │            Stored as `tokenHash` in MongoDB (`select: false`)
+     │
+     ▼
+Raw Token returned ONCE to Warden/Student API client
+(Never persisted or logged)
+```
+
+### 3. Atomic Concurrency Protection Against Double-Scanning
+To prevent race conditions where a QR token is scanned simultaneously at two different security posts:
+```typescript
+const consumedPass = await GatePass.findOneAndUpdate(
+  {
+    _id: pass._id,
+    status: GatePassStatus.APPROVED,
+    usedAt: { $exists: false },
+  },
+  {
+    $set: {
+      status: GatePassStatus.USED,
+      usedAt: now,
+    },
+  },
+  { new: true }
+);
+
+if (!consumedPass) {
+  throw new ConflictError('Gate pass has already been used or modified', 'GATE_SCAN_CONFLICT');
+}
+```
+If two requests execute concurrently for the same approved pass:
+- **Request 1**: Matches `{ status: 'approved' }`, atomically updates status to `'used'`, returns `200 OK` with pass details and records a `GateEvent` audit log (`exit` / `entry`).
+- **Request 2**: Fails to match the conditional update query because `status` is no longer `'approved'`. Returns `409 Conflict` (`GATE_SCAN_CONFLICT`).
+
+### 4. Gate Event Audit Logging
+Every successful gate pass scan automatically emits an immutable `GateEvent` record capturing:
+- `gatePassId`: Reference to the consumed `GatePass`.
+- `studentId`: Student user ID associated with the pass.
+- `securityUserId`: Security staff ID executing the scan.
+- `eventType`: `exit` or `entry` (inferred from timestamps).
+- `gateId`: Campus gate identifier (e.g. `MAIN_GATE_NORTH`).
+- `scannedAt`: ISO Timestamp of scan execution.
 
 ---
 
@@ -109,7 +175,8 @@ $$\text{attendancePercentage} = \frac{\text{present} + \text{late}}{\text{totalC
 
 ## Authorization Boundaries (RBAC)
 
-- **Administrator**: Full system access across academic and campus operations domains.
-- **Warden**: Full management over hostels, blocks, room allocations, complaint assignments, and mess menus.
+- **Administrator**: Full system access across academic, campus operations, and security gate pass domains.
+- **Warden**: Gate pass approval/rejection, hostels, blocks, room allocations, complaint assignments, and mess menus.
+- **Security**: Gate pass scan verification and gate audit log viewing.
 - **Staff**: Asset maintenance updates, complaint status resolution, and facility inspection.
-- **Student**: Room allocation viewing (`/allocations/my`), complaint registration/self-management, mess menu viewing, and mess feedback submission.
+- **Student**: Gate pass application & cancellation, room allocation viewing (`/allocations/my`), complaint registration/self-management, mess menu viewing, and mess feedback submission.

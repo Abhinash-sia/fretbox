@@ -112,6 +112,20 @@ export enum MealType {
   DINNER = 'dinner',
 }
 
+export enum GatePassStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  CANCELLED = 'cancelled',
+  EXPIRED = 'expired',
+  USED = 'used',
+}
+
+export enum GateEventType {
+  EXIT = 'exit',
+  ENTRY = 'entry',
+}
+
 export class AppError extends Error {
   public readonly statusCode: number;
   public readonly code: string;

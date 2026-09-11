@@ -238,10 +238,7 @@ export class HostelService {
       status: AllocationStatus.ACTIVE,
     });
     if (activeAllocation) {
-      throw new ConflictError(
-        'Student already has an active room allocation',
-        'ALLOCATION_EXISTS',
-      );
+      throw new ConflictError('Student already has an active room allocation', 'ALLOCATION_EXISTS');
     }
 
     const room = await Room.findById(data.roomId);

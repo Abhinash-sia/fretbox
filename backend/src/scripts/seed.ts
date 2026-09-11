@@ -21,6 +21,8 @@ import { ComplaintAssignment } from '../models/complaintAssignment.model.js';
 import { ComplaintAudit } from '../models/complaintAudit.model.js';
 import { MessMenu } from '../models/messMenu.model.js';
 import { MessFeedback } from '../models/messFeedback.model.js';
+import { GatePass } from '../models/gatePass.model.js';
+import { GateEvent } from '../models/gateEvent.model.js';
 import { passwordService } from '../services/password.service.js';
 import {
   UserRole,
@@ -37,6 +39,8 @@ import {
   ComplaintStatus,
   ComplaintAuditAction,
   MealType,
+  GatePassStatus,
+  GateEventType,
 } from '../types/index.js';
 import { logger } from '../config/logger.js';
 
@@ -456,6 +460,50 @@ async function seed() {
       });
 
       logger.info('Seeded Mess Menu & Student Feedback');
+    }
+
+    // 18. Gate Passes & Gate Events
+    let gatePass1 = await GatePass.findOne({ passNumber: 'FBX-GP-2026-DEMO01' });
+    if (!gatePass1) {
+      const securityId = userMap.get('security@fretbox.demo')!;
+      const outTime = new Date();
+      outTime.setHours(outTime.getHours() - 1);
+      const returnTime = new Date();
+      returnTime.setHours(returnTime.getHours() + 5);
+
+      gatePass1 = await GatePass.create({
+        passNumber: 'FBX-GP-2026-DEMO01',
+        studentId: student1Id,
+        reason: 'Weekend Home Visit',
+        destination: 'Home',
+        outDateTime: outTime,
+        expectedReturnDateTime: returnTime,
+        status: GatePassStatus.USED,
+        approvedBy: wardenId,
+        usedAt: new Date(),
+      });
+
+      await GateEvent.create({
+        gatePassId: gatePass1._id,
+        studentId: student1Id,
+        securityUserId: securityId,
+        eventType: GateEventType.EXIT,
+        gateId: 'main-gate',
+        scannedAt: new Date(),
+      });
+
+      // Pending Pass for Student 2
+      await GatePass.create({
+        passNumber: 'FBX-GP-2026-DEMO02',
+        studentId: student2Id,
+        reason: 'Library Books Purchase',
+        destination: 'City Center Mall',
+        outDateTime: new Date(),
+        expectedReturnDateTime: new Date(Date.now() + 4 * 60 * 60 * 1000),
+        status: GatePassStatus.PENDING,
+      });
+
+      logger.info('Seeded Gate Passes & Gate Event');
     }
 
     logger.info('Seed completed successfully! Log in using student@fretbox.demo / Password123!');
