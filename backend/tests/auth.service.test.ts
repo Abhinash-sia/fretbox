@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { authService } from '../src/services/auth.service.js';
-import { User } from '../src/models/user.model.js';
-import { RefreshToken } from '../src/models/refreshToken.model.js';
+import { authService } from '../src/modules/auth/services/auth.service.js';
+import { User } from '../src/modules/auth/models/user.model.js';
+import { RefreshToken } from '../src/modules/auth/models/refreshToken.model.js';
 import { UserRole, ConflictError, UnauthorizedError } from '../src/types/index.js';
 
 describe('AuthService', () => {

@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { ComplaintService } from '../src/services/complaint.service.js';
-import { Complaint } from '../src/models/complaint.model.js';
-import { ComplaintAssignment } from '../src/models/complaintAssignment.model.js';
-import { ComplaintAudit } from '../src/models/complaintAudit.model.js';
-import { User } from '../src/models/user.model.js';
+import { ComplaintService } from '../src/modules/complaints/services/complaint.service.js';
+import { Complaint } from '../src/modules/complaints/models/complaint.model.js';
+import { ComplaintAssignment } from '../src/modules/complaints/models/complaintAssignment.model.js';
+import { ComplaintAudit } from '../src/modules/complaints/models/complaintAudit.model.js';
+import { User } from '../src/modules/auth/models/user.model.js';
 import {
   ComplaintCategory,
   ComplaintPriority,

@@ -1,17 +1,17 @@
 import { Router } from 'express';
-import healthRoutes from './health.routes.js';
-import authRoutes from './auth.routes.js';
-import academicRoutes from './academic.routes.js';
-import hostelRoutes from './hostel.routes.js';
-import facilityRoutes from './facility.routes.js';
-import complaintRoutes from './complaint.routes.js';
-import messRoutes from './mess.routes.js';
-import gatePassRoutes from './gatePass.routes.js';
-import gateEventRoutes from './gateEvent.routes.js';
-import communicationRoutes from './communication.routes.js';
-import analyticsRoutes from './analytics.routes.js';
-import faqRoutes from './faq.routes.js';
-import predictionRoutes from './prediction.routes.js';
+import healthRoutes from '../modules/health/routes/health.routes.js';
+import authRoutes from '../modules/auth/routes/auth.routes.js';
+import academicRoutes from '../modules/academic/routes/academic.routes.js';
+import hostelRoutes from '../modules/hostel/routes/hostel.routes.js';
+import facilityRoutes from '../modules/hostel/routes/facility.routes.js';
+import complaintRoutes from '../modules/complaints/routes/complaint.routes.js';
+import messRoutes from '../modules/hostel/routes/mess.routes.js';
+import gatePassRoutes from '../modules/gate-pass/routes/gatePass.routes.js';
+import gateEventRoutes from '../modules/gate-pass/routes/gateEvent.routes.js';
+import communicationRoutes from '../modules/communication/routes/communication.routes.js';
+import analyticsRoutes from '../modules/analytics/routes/analytics.routes.js';
+import faqRoutes from '../modules/ai/faq/routes/faq.routes.js';
+import predictionRoutes from '../modules/predictions/routes/prediction.routes.js';
 
 const apiV1Router = Router();
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { passwordService } from '../src/services/password.service.js';
+import { passwordService } from '../src/modules/auth/services/password.service.js';
 
 describe('PasswordService', () => {
   it('should generate a valid bcrypt hash from a plaintext password', async () => {

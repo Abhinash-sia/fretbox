@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { academicService } from '../src/services/academic.service.js';
-import { Department } from '../src/models/department.model.js';
-import { Program } from '../src/models/program.model.js';
-import { AcademicYear } from '../src/models/academicYear.model.js';
-import { Semester } from '../src/models/semester.model.js';
-import { Course } from '../src/models/course.model.js';
+import { academicService } from '../src/modules/academic/services/academic.service.js';
+import { Department } from '../src/modules/academic/models/department.model.js';
+import { Program } from '../src/modules/academic/models/program.model.js';
+import { AcademicYear } from '../src/modules/academic/models/academicYear.model.js';
+import { Semester } from '../src/modules/academic/models/semester.model.js';
+import { Course } from '../src/modules/academic/models/course.model.js';
 import { ConflictError, NotFoundError } from '../src/types/index.js';
 
 describe('AcademicService Master Data CRUD', () => {

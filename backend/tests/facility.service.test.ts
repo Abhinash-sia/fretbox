@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { FacilityService } from '../src/services/facility.service.js';
-import { FacilityAsset } from '../src/models/facilityAsset.model.js';
+import { FacilityService } from '../src/modules/hostel/services/facility.service.js';
+import { FacilityAsset } from '../src/modules/hostel/models/facilityAsset.model.js';
 import { AssetCategory, AssetStatus, AssetCondition, ConflictError } from '../src/types/index.js';
 
 describe('FacilityService Unit Tests', () => {

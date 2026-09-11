@@ -1,8 +1,96 @@
-# Fretbox Backend Architecture — Phase B9 (Demand Prediction & Forecasting Domain)
+# Fretbox Backend Architecture — Modular Monolith
 
 ## Architectural Overview
 
-Fretbox backend follows a modular, layer-separated architecture designed for high scalability, testability, and clear domain boundaries across Academic, Operations, Gate Pass/Security, and Communication/Real-Time domains.
+Fretbox backend follows a clean **Modular Monolith** architecture. Code is organized by business domain under `src/modules/` rather than by development milestone phases. Shared cross-cutting concerns (authentication, rate limiting, error handling, database connection, Redis, logging) are maintained under `src/infrastructure/`, `src/config/`, `src/middlewares/`, `src/types/`, and `src/utils/`.
+
+### Directory Tree & Domain Structure
+
+```
+src/
+├── modules/
+│   ├── auth/                      # Authentication & Token Management
+│   │   ├── models/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   └── routes/
+│   ├── academic/                  # Academic Programs, Courses & Attendance
+│   │   ├── models/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   └── schemas/
+│   ├── hostel/                    # Hostels, Rooms, Allocations, Assets & Mess
+│   │   ├── models/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   └── schemas/
+│   ├── complaints/                # Complaint Management & Assignment
+│   │   ├── models/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   └── routes/
+│   ├── gate-pass/                 # Gate Passes & Security Scan Events
+│   │   ├── models/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   └── schemas/
+│   ├── communication/             # Announcements, Notifications & Socket.IO
+│   │   ├── models/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   └── schemas/
+│   ├── analytics/                 # Operational Intelligence Aggregation
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   └── schemas/
+│   ├── ai/                        # AI Features
+│   │   ├── complaint-classification/
+│   │   │   ├── providers/
+│   │   │   ├── services/
+│   │   │   └── schemas/
+│   │   └── faq/
+│   │       ├── models/
+│   │       ├── controllers/
+│   │       ├── services/
+│   │       ├── routes/
+│   │       └── schemas/
+│   ├── predictions/               # Demand Forecasting Engine
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   └── schemas/
+│   ├── calendar/                  # Academic Calendar Events
+│   │   ├── models/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   └── schemas/
+│   ├── payments/                  # Student Fees, Razorpay Orders & Webhooks
+│   │   ├── models/
+│   │   ├── providers/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   └── schemas/
+│   └── health/                    # Health & Readiness Status
+│       ├── controllers/
+│       ├── services/
+│       └── routes/
+├── infrastructure/
+│   ├── mongodb/                   # MongoDB connection management
+│   └── redis/                     # Redis client connection management
+├── config/                        # Shared environment & logger configuration
+├── middlewares/                   # Auth, RBAC, Validation, Error, & Rate limiters
+├── types/                         # Shared application interface types & enums
+├── utils/                         # Standardized API response formatters
+├── app.ts                         # Express Application factory
+└── server.ts                      # Server entrypoint & graceful shutdown
+```
 
 ### Request Flow Diagram
 
@@ -25,13 +113,13 @@ RBAC Authorization Middleware (`authorize(...roles)`) ──► 403 Forbidden
 Route Handler & Zod Validation Middleware (`validate`)
     │
     ▼
-Controller Layer (`communication.controller.ts`, `gatePass.controller.ts`, `hostel.controller.ts`, etc.)
+Domain Controller Layer (`src/modules/<domain>/controllers/`)
     │
     ▼
-Service Layer (`announcement.service.ts`, `audience.service.ts`, `notification.service.ts`, `realtime.service.ts`, etc.)
+Domain Service Layer (`src/modules/<domain>/services/`)
     │
     ▼
-Mongoose Model Layer (`Announcement`, `Notification`, `GatePass`, `Hostel`, `User`, etc.)
+Mongoose Model Layer (`src/modules/<domain>/models/`)
     │
     ▼
 MongoDB Database (`fretbox` database on localhost:27017)

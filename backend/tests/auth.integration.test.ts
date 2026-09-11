@@ -2,8 +2,8 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import { createApp } from '../src/app.js';
-import { User } from '../src/models/user.model.js';
-import { RefreshToken } from '../src/models/refreshToken.model.js';
+import { User } from '../src/modules/auth/models/user.model.js';
+import { RefreshToken } from '../src/modules/auth/models/refreshToken.model.js';
 import { UserRole } from '../src/types/index.js';
 
 describe('Authentication & RBAC Integration API Tests', () => {

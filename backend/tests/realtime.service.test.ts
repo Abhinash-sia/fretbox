@@ -6,8 +6,8 @@ import {
   initRealtimeServer,
   emitToUser,
   closeRealtimeServer,
-} from '../src/services/realtime.service.js';
-import { tokenService } from '../src/services/token.service.js';
+} from '../src/modules/communication/services/realtime.service.js';
+import { tokenService } from '../src/modules/auth/services/token.service.js';
 import { UserRole } from '../src/types/index.js';
 
 describe('RealtimeService Unit & Socket Integration Tests', () => {

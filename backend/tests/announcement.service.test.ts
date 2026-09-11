@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
 import mongoose, { Types } from 'mongoose';
-import { Announcement } from '../src/models/announcement.model.js';
-import { AnnouncementService } from '../src/services/announcement.service.js';
+import { Announcement } from '../src/modules/communication/models/announcement.model.js';
+import { AnnouncementService } from '../src/modules/communication/services/announcement.service.js';
 import {
   AnnouncementPriority,
   AnnouncementStatus,

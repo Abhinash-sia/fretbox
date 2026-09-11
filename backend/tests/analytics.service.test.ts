@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
 import mongoose, { Types } from 'mongoose';
-import { Complaint } from '../src/models/complaint.model.js';
-import { AttendanceRecord } from '../src/models/attendanceRecord.model.js';
-import { AnalyticsService } from '../src/services/analytics.service.js';
+import { Complaint } from '../src/modules/complaints/models/complaint.model.js';
+import { AttendanceRecord } from '../src/modules/academic/models/attendanceRecord.model.js';
+import { AnalyticsService } from '../src/modules/analytics/services/analytics.service.js';
 import {
   AttendanceStatus,
   ComplaintCategory,

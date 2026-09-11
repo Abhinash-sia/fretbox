@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { User } from '../src/models/user.model.js';
+import { User } from '../src/modules/auth/models/user.model.js';
 import { UserRole } from '../src/types/index.js';
 
 describe('User Mongoose Model', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { tokenService } from '../src/services/token.service.js';
+import { tokenService } from '../src/modules/auth/services/token.service.js';
 import { UserRole, UnauthorizedError } from '../src/types/index.js';
 
 describe('TokenService (JWT & Token Hashing)', () => {

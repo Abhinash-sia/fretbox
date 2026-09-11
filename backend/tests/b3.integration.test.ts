@@ -2,19 +2,19 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import { createApp } from '../src/app.js';
-import { User } from '../src/models/user.model.js';
-import { Hostel } from '../src/models/hostel.model.js';
-import { HostelBlock } from '../src/models/hostelBlock.model.js';
-import { Room } from '../src/models/room.model.js';
-import { StudentRoomAllocation } from '../src/models/studentRoomAllocation.model.js';
-import { FacilityAsset } from '../src/models/facilityAsset.model.js';
-import { Complaint } from '../src/models/complaint.model.js';
-import { ComplaintAssignment } from '../src/models/complaintAssignment.model.js';
-import { ComplaintAudit } from '../src/models/complaintAudit.model.js';
-import { MessMenu } from '../src/models/messMenu.model.js';
-import { MessFeedback } from '../src/models/messFeedback.model.js';
-import { tokenService } from '../src/services/token.service.js';
-import { passwordService } from '../src/services/password.service.js';
+import { User } from '../src/modules/auth/models/user.model.js';
+import { Hostel } from '../src/modules/hostel/models/hostel.model.js';
+import { HostelBlock } from '../src/modules/hostel/models/hostelBlock.model.js';
+import { Room } from '../src/modules/hostel/models/room.model.js';
+import { StudentRoomAllocation } from '../src/modules/hostel/models/studentRoomAllocation.model.js';
+import { FacilityAsset } from '../src/modules/hostel/models/facilityAsset.model.js';
+import { Complaint } from '../src/modules/complaints/models/complaint.model.js';
+import { ComplaintAssignment } from '../src/modules/complaints/models/complaintAssignment.model.js';
+import { ComplaintAudit } from '../src/modules/complaints/models/complaintAudit.model.js';
+import { MessMenu } from '../src/modules/hostel/models/messMenu.model.js';
+import { MessFeedback } from '../src/modules/hostel/models/messFeedback.model.js';
+import { tokenService } from '../src/modules/auth/services/token.service.js';
+import { passwordService } from '../src/modules/auth/services/password.service.js';
 import {
   UserRole,
   HostelCategory,

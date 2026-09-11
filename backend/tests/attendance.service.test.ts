@@ -1,19 +1,19 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { attendanceService } from '../src/services/attendance.service.js';
+import { attendanceService } from '../src/modules/academic/services/attendance.service.js';
 import { calculateAttendancePercentage } from '../src/config/academic.config.js';
-import { User } from '../src/models/user.model.js';
-import { Department } from '../src/models/department.model.js';
-import { Program } from '../src/models/program.model.js';
-import { AcademicYear } from '../src/models/academicYear.model.js';
-import { Semester } from '../src/models/semester.model.js';
-import { Course } from '../src/models/course.model.js';
-import { ClassSection } from '../src/models/classSection.model.js';
-import { FacultyAssignment } from '../src/models/facultyAssignment.model.js';
-import { StudentEnrollment } from '../src/models/studentEnrollment.model.js';
-import { AttendanceSession } from '../src/models/attendanceSession.model.js';
-import { AttendanceRecord } from '../src/models/attendanceRecord.model.js';
-import { AttendanceAudit } from '../src/models/attendanceAudit.model.js';
+import { User } from '../src/modules/auth/models/user.model.js';
+import { Department } from '../src/modules/academic/models/department.model.js';
+import { Program } from '../src/modules/academic/models/program.model.js';
+import { AcademicYear } from '../src/modules/academic/models/academicYear.model.js';
+import { Semester } from '../src/modules/academic/models/semester.model.js';
+import { Course } from '../src/modules/academic/models/course.model.js';
+import { ClassSection } from '../src/modules/academic/models/classSection.model.js';
+import { FacultyAssignment } from '../src/modules/academic/models/facultyAssignment.model.js';
+import { StudentEnrollment } from '../src/modules/academic/models/studentEnrollment.model.js';
+import { AttendanceSession } from '../src/modules/academic/models/attendanceSession.model.js';
+import { AttendanceRecord } from '../src/modules/academic/models/attendanceRecord.model.js';
+import { AttendanceAudit } from '../src/modules/academic/models/attendanceAudit.model.js';
 import { UserRole, AttendanceStatus, ForbiddenError, BadRequestError } from '../src/types/index.js';
 
 describe('Attendance Calculation Formula & Service', () => {

@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { MessService } from '../src/services/mess.service.js';
-import { MessMenu } from '../src/models/messMenu.model.js';
-import { MessFeedback } from '../src/models/messFeedback.model.js';
-import { User } from '../src/models/user.model.js';
+import { MessService } from '../src/modules/hostel/services/mess.service.js';
+import { MessMenu } from '../src/modules/hostel/models/messMenu.model.js';
+import { MessFeedback } from '../src/modules/hostel/models/messFeedback.model.js';
+import { User } from '../src/modules/auth/models/user.model.js';
 import { MealType, UserRole, ConflictError } from '../src/types/index.js';
 
 describe('MessService Unit Tests', () => {

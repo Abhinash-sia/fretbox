@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { GatePassService } from '../src/services/gatePass.service.js';
-import { GatePass } from '../src/models/gatePass.model.js';
-import { GateEvent } from '../src/models/gateEvent.model.js';
-import { User } from '../src/models/user.model.js';
+import { GatePassService } from '../src/modules/gate-pass/services/gatePass.service.js';
+import { GatePass } from '../src/modules/gate-pass/models/gatePass.model.js';
+import { GateEvent } from '../src/modules/gate-pass/models/gateEvent.model.js';
+import { User } from '../src/modules/auth/models/user.model.js';
 import { GatePassStatus, UserRole, BadRequestError, ForbiddenError } from '../src/types/index.js';
 
 describe('GatePassService Unit Tests', () => {

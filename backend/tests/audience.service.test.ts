@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
 import mongoose, { Types } from 'mongoose';
-import { User } from '../src/models/user.model.js';
-import { Hostel } from '../src/models/hostel.model.js';
-import { StudentRoomAllocation } from '../src/models/studentRoomAllocation.model.js';
-import { AudienceService } from '../src/services/audience.service.js';
+import { User } from '../src/modules/auth/models/user.model.js';
+import { Hostel } from '../src/modules/hostel/models/hostel.model.js';
+import { StudentRoomAllocation } from '../src/modules/hostel/models/studentRoomAllocation.model.js';
+import { AudienceService } from '../src/modules/communication/services/audience.service.js';
 import { AuthUserContext, HostelCategory, UserRole } from '../src/types/index.js';
 
 describe('AudienceService Unit Tests', () => {

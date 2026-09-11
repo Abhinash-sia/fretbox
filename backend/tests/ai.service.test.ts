@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ComplaintClassificationService } from '../src/services/ai/complaint-classification.service.js';
-import { GeminiProvider } from '../src/services/ai/gemini.provider.js';
+import { ComplaintClassificationService } from '../src/modules/ai/complaint-classification/services/complaint-classification.service.js';
+import { GeminiProvider } from '../src/modules/ai/complaint-classification/providers/gemini.provider.js';
 import {
   AiClassificationStatus,
   ComplaintCategory,

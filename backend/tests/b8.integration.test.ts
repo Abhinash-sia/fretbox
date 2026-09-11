@@ -2,10 +2,10 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import { createApp } from '../src/app.js';
-import { User } from '../src/models/user.model.js';
-import { FaqDocument } from '../src/models/faqDocument.model.js';
-import { tokenService } from '../src/services/token.service.js';
-import { passwordService } from '../src/services/password.service.js';
+import { User } from '../src/modules/auth/models/user.model.js';
+import { FaqDocument } from '../src/modules/ai/faq/models/faqDocument.model.js';
+import { tokenService } from '../src/modules/auth/services/token.service.js';
+import { passwordService } from '../src/modules/auth/services/password.service.js';
 import { UserRole, FaqCategory } from '../src/types/index.js';
 
 describe('Phase B8 Campus FAQ & RAG Integration API Tests', () => {

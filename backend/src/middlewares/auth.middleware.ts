@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { tokenService } from '../services/token.service.js';
-import { User } from '../models/user.model.js';
+import { tokenService } from '../modules/auth/services/token.service.js';
+import { User } from '../modules/auth/models/user.model.js';
 import { UnauthorizedError } from '../types/index.js';
 
 export const authenticate = async (

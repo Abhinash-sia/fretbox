@@ -2,11 +2,11 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import { createApp } from '../src/app.js';
-import { User } from '../src/models/user.model.js';
-import { GatePass } from '../src/models/gatePass.model.js';
-import { GateEvent } from '../src/models/gateEvent.model.js';
-import { tokenService } from '../src/services/token.service.js';
-import { passwordService } from '../src/services/password.service.js';
+import { User } from '../src/modules/auth/models/user.model.js';
+import { GatePass } from '../src/modules/gate-pass/models/gatePass.model.js';
+import { GateEvent } from '../src/modules/gate-pass/models/gateEvent.model.js';
+import { tokenService } from '../src/modules/auth/services/token.service.js';
+import { passwordService } from '../src/modules/auth/services/password.service.js';
 import { UserRole } from '../src/types/index.js';
 
 describe('Phase B4 Gate Pass & Security Integration API Tests', () => {

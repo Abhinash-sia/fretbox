@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { FaqService } from '../src/services/faq.service.js';
-import { GeminiProvider } from '../src/services/ai/gemini.provider.js';
+import { FaqService } from '../src/modules/ai/faq/services/faq.service.js';
+import { GeminiProvider } from '../src/modules/ai/complaint-classification/providers/gemini.provider.js';
 import { FaqCategory, UserRole } from '../src/types/index.js';
 
 describe('FaqService Unit Tests & Retrieval Grounding', () => {

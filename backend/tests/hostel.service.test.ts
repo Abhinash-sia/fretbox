@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { HostelService } from '../src/services/hostel.service.js';
-import { Hostel } from '../src/models/hostel.model.js';
-import { HostelBlock } from '../src/models/hostelBlock.model.js';
-import { Room } from '../src/models/room.model.js';
-import { StudentRoomAllocation } from '../src/models/studentRoomAllocation.model.js';
-import { User } from '../src/models/user.model.js';
+import { HostelService } from '../src/modules/hostel/services/hostel.service.js';
+import { Hostel } from '../src/modules/hostel/models/hostel.model.js';
+import { HostelBlock } from '../src/modules/hostel/models/hostelBlock.model.js';
+import { Room } from '../src/modules/hostel/models/room.model.js';
+import { StudentRoomAllocation } from '../src/modules/hostel/models/studentRoomAllocation.model.js';
+import { User } from '../src/modules/auth/models/user.model.js';
 import {
   HostelCategory,
   RoomStatus,

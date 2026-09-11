@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
 import mongoose, { Types } from 'mongoose';
-import { Notification } from '../src/models/notification.model.js';
-import { NotificationService } from '../src/services/notification.service.js';
+import { Notification } from '../src/modules/communication/models/notification.model.js';
+import { NotificationService } from '../src/modules/communication/services/notification.service.js';
 import { AnnouncementPriority, NotFoundError, NotificationType } from '../src/types/index.js';
 
 describe('NotificationService Unit Tests', () => {

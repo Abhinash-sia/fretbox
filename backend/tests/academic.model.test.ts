@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { Department } from '../src/models/department.model.js';
-import { Program } from '../src/models/program.model.js';
-import { AcademicYear } from '../src/models/academicYear.model.js';
+import { Department } from '../src/modules/academic/models/department.model.js';
+import { Program } from '../src/modules/academic/models/program.model.js';
+import { AcademicYear } from '../src/modules/academic/models/academicYear.model.js';
 
 describe('Academic Mongoose Models', () => {
   beforeAll(async () => {

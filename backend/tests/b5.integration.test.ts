@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import { createApp } from '../src/app.js';
-import { User } from '../src/models/user.model.js';
-import { Announcement } from '../src/models/announcement.model.js';
-import { Notification } from '../src/models/notification.model.js';
-import { passwordService } from '../src/services/password.service.js';
-import { tokenService } from '../src/services/token.service.js';
+import { User } from '../src/modules/auth/models/user.model.js';
+import { Announcement } from '../src/modules/communication/models/announcement.model.js';
+import { Notification } from '../src/modules/communication/models/notification.model.js';
+import { passwordService } from '../src/modules/auth/services/password.service.js';
+import { tokenService } from '../src/modules/auth/services/token.service.js';
 import { AnnouncementStatus, UserRole } from '../src/types/index.js';
 
 describe('Phase B5 Communication Integration API Tests', () => {

@@ -2,9 +2,12 @@ import { Server } from 'http';
 import { createApp } from './app.js';
 import { getEnv } from './config/env.js';
 import { logger } from './config/logger.js';
-import { connectDB, disconnectDB } from './config/db.js';
-import { connectRedis, disconnectRedis } from './config/redis.js';
-import { initRealtimeServer, closeRealtimeServer } from './services/realtime.service.js';
+import { connectDB, disconnectDB } from './infrastructure/mongodb/db.js';
+import { connectRedis, disconnectRedis } from './infrastructure/redis/redis.js';
+import {
+  initRealtimeServer,
+  closeRealtimeServer,
+} from './modules/communication/services/realtime.service.js';
 
 let server: Server | null = null;
 let isShuttingDown = false;

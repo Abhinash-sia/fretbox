@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
 import mongoose, { Types } from 'mongoose';
 import { createApp } from '../src/app.js';
-import { User } from '../src/models/user.model.js';
-import { Complaint } from '../src/models/complaint.model.js';
-import { GateEvent } from '../src/models/gateEvent.model.js';
-import { passwordService } from '../src/services/password.service.js';
-import { tokenService } from '../src/services/token.service.js';
+import { User } from '../src/modules/auth/models/user.model.js';
+import { Complaint } from '../src/modules/complaints/models/complaint.model.js';
+import { GateEvent } from '../src/modules/gate-pass/models/gateEvent.model.js';
+import { passwordService } from '../src/modules/auth/services/password.service.js';
+import { tokenService } from '../src/modules/auth/services/token.service.js';
 import {
   ComplaintCategory,
   ComplaintPriority,
