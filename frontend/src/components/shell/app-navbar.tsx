@@ -30,20 +30,31 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/components/providers/auth-provider';
 import { UserRole } from '@/config/navigation.config';
 
 interface AppNavbarProps {
-  currentRole: UserRole;
+  currentRole?: UserRole;
   onOpenCommand: () => void;
   onOpenMobileMenu: () => void;
 }
 
 export function AppNavbar({
-  currentRole,
   onOpenCommand,
   onOpenMobileMenu,
 }: AppNavbarProps) {
   const { theme, setTheme } = useTheme();
+  const { user, role, logout } = useAuth();
+  const activeRole = role || 'student';
+
+  const userInitials = user?.name
+    ? user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .substring(0, 2)
+        .toUpperCase()
+    : activeRole.substring(0, 2).toUpperCase();
 
   return (
     <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur-xs select-none">
@@ -67,7 +78,7 @@ export function AppNavbar({
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage className="capitalize font-semibold text-foreground">
-                {currentRole} Dashboard
+                {activeRole} Dashboard
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
@@ -121,14 +132,14 @@ export function AppNavbar({
               className="flex items-center gap-2 px-2 h-9 text-xs hover:bg-muted"
             >
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold text-xs">
-                {currentRole.substring(0, 2).toUpperCase()}
+                {userInitials}
               </div>
               <div className="hidden md:flex flex-col text-left">
                 <span className="font-semibold text-foreground capitalize leading-none">
-                  {currentRole} User
+                  {user?.name || `${activeRole} User`}
                 </span>
                 <span className="text-[10px] text-muted-foreground leading-none mt-0.5">
-                  fretbox.demo
+                  {user?.email || 'authenticated'}
                 </span>
               </div>
             </Button>
@@ -137,12 +148,12 @@ export function AppNavbar({
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-xs font-semibold leading-none capitalize">
-                  {currentRole} User
+                  {user?.name || `${activeRole} User`}
                 </p>
-                <p className="text-[10px] text-muted-foreground">demo@fretbox.edu</p>
+                <p className="text-[10px] text-muted-foreground">{user?.email || 'authenticated'}</p>
                 <div className="pt-1">
-                  <Badge variant="outline" className="text-[10px] uppercase font-mono">
-                    {currentRole}
+                  <Badge variant="outline" className="text-[10px] uppercase font-mono text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
+                    {activeRole}
                   </Badge>
                 </div>
               </div>
@@ -157,7 +168,10 @@ export function AppNavbar({
               <span>Security & Roles</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-rose-600 dark:text-rose-400">
+            <DropdownMenuItem
+              className="text-rose-600 dark:text-rose-400 cursor-pointer"
+              onClick={() => logout()}
+            >
               <LogOut className="mr-2 h-3.5 w-3.5" />
               <span>Sign Out</span>
             </DropdownMenuItem>

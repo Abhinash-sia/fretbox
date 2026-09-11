@@ -26,12 +26,12 @@ import {
   Sparkles,
   Box,
   Megaphone,
-  ChevronDown,
   Building,
   LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/components/providers/auth-provider';
 import { UserRole, ROLE_NAVIGATION, NavItem } from '@/config/navigation.config';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -61,13 +61,13 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 interface AppSidebarProps {
-  currentRole: UserRole;
-  onRoleChange: (role: UserRole) => void;
   className?: string;
 }
 
-export function AppSidebar({ currentRole, onRoleChange, className }: AppSidebarProps) {
+export function AppSidebar({ className }: AppSidebarProps) {
   const pathname = usePathname();
+  const { role: userRole } = useAuth();
+  const currentRole: UserRole = userRole || 'student';
   const navigationGroups = ROLE_NAVIGATION[currentRole] || [];
 
   return (
@@ -90,25 +90,16 @@ export function AppSidebar({ currentRole, onRoleChange, className }: AppSidebarP
         </div>
       </div>
 
-      {/* 2. Role Selector (F1 Interactive Demo Switcher) */}
+      {/* 2. Authenticated Role Badge (Production F2 RBAC) */}
       <div className="border-b border-[hsl(var(--sidebar-border))] p-3">
         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
-          Active Role Context
+          Authenticated Role Context
         </label>
-        <div className="relative">
-          <select
-            value={currentRole}
-            onChange={(e) => onRoleChange(e.target.value as UserRole)}
-            className="w-full appearance-none rounded-md bg-[hsl(var(--sidebar-muted))] border border-[hsl(var(--sidebar-border))] px-3 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer font-medium"
-          >
-            <option value="student">Student Portal</option>
-            <option value="faculty">Faculty Portal</option>
-            <option value="staff">Staff Portal</option>
-            <option value="warden">Warden Portal</option>
-            <option value="security">Security Post</option>
-            <option value="administrator">Administrator HQ</option>
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+        <div className="flex items-center justify-between rounded-md bg-[hsl(var(--sidebar-muted))] border border-[hsl(var(--sidebar-border))] px-3 py-1.5 text-xs text-white font-medium">
+          <span className="capitalize">{currentRole} Portal</span>
+          <Badge variant="outline" className="text-[9px] uppercase font-mono text-emerald-400 border-emerald-500/30 px-1.5 py-0">
+            RBAC Active
+          </Badge>
         </div>
       </div>
 
@@ -163,7 +154,7 @@ export function AppSidebar({ currentRole, onRoleChange, className }: AppSidebarP
       {/* 4. Footer Metadata */}
       <div className="border-t border-[hsl(var(--sidebar-border))] p-3 text-[10px] text-slate-400 flex items-center justify-between">
         <span>Fretbox v1.0.0</span>
-        <span className="font-mono text-emerald-400">F1 Shell Ready</span>
+        <span className="font-mono text-emerald-400">F2 Session Auth</span>
       </div>
     </aside>
   );

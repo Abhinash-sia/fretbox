@@ -5,17 +5,20 @@ import { cn } from '@/lib/utils';
 
 interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
-  message: string;
+  message?: string;
+  description?: string;
   onRetry?: () => void;
 }
 
 export function ErrorState({
   title = 'System Error Encountered',
   message,
+  description,
   onRetry,
   className,
   ...props
 }: ErrorStateProps) {
+  const errorMessage = message || description || 'An unexpected system error occurred.';
   return (
     <div
       className={cn(
@@ -28,7 +31,7 @@ export function ErrorState({
         <AlertTriangle className="h-6 w-6" />
       </div>
       <h3 className="text-base font-semibold text-rose-900 dark:text-rose-200">{title}</h3>
-      <p className="mt-1 text-xs text-rose-700 dark:text-rose-400 max-w-md">{message}</p>
+      <p className="mt-1 text-xs text-rose-700 dark:text-rose-400 max-w-md">{errorMessage}</p>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry} className="mt-4 border-rose-300 text-rose-800 hover:bg-rose-100 dark:border-rose-800 dark:text-rose-300">
           <RotateCcw className="mr-2 h-3.5 w-3.5" />
