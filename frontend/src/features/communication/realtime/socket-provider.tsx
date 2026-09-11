@@ -71,18 +71,23 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setLastEvent({ name: 'notification:new', payload, timestamp: Date.now() });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics-overview'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics-complaints'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics-communication'] });
     };
 
     const handleNotificationRead = (payload: NotificationReadPayload) => {
       setLastEvent({ name: 'notification:read', payload, timestamp: Date.now() });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics-communication'] });
     };
 
     const handleNotificationAction = (payload: NotificationActionPayload) => {
       setLastEvent({ name: 'notification:action', payload, timestamp: Date.now() });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics-communication'] });
     };
 
     const handleAnnouncementPublished = (payload: AnnouncementPublishedPayload) => {
@@ -90,6 +95,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics-communication'] });
     };
 
     s.on('notification:new', handleNotificationNew);
