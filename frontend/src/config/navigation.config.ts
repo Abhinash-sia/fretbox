@@ -76,9 +76,8 @@ export const ROLE_NAVIGATION: RoleNavigation = {
       groupName: 'Workplace Tasks',
       items: [
         { title: 'Dashboard', href: '/staff/dashboard', iconName: 'LayoutDashboard' },
-        { title: 'Assigned Complaints', href: '/staff/complaints/assigned', iconName: 'Wrench', badge: 5, badgeVariant: 'danger' },
-        { title: 'Complaint Queue', href: '/staff/complaints/queue', iconName: 'ListCheck' },
-        { title: 'Notifications', href: '/staff/notifications', iconName: 'Bell' },
+        { title: 'Assigned Complaints', href: '/staff/complaints', iconName: 'Wrench' },
+        { title: 'Facility Inspection', href: '/staff/facilities', iconName: 'Box' },
       ],
     },
   ],
@@ -88,24 +87,16 @@ export const ROLE_NAVIGATION: RoleNavigation = {
       groupName: 'Hostel Operations',
       items: [
         { title: 'Dashboard', href: '/warden/dashboard', iconName: 'LayoutDashboard' },
-        { title: 'Hostel Overview', href: '/warden/hostel', iconName: 'Building2' },
-        { title: 'Residents', href: '/warden/residents', iconName: 'Users' },
-        { title: 'Room Allocations', href: '/warden/rooms', iconName: 'Bed' },
+        { title: 'Hostels & Blocks', href: '/warden/hostel', iconName: 'Building2' },
+        { title: 'Room Inventory', href: '/warden/rooms', iconName: 'Bed' },
+        { title: 'Student Allocations', href: '/warden/allocations', iconName: 'Users' },
       ],
     },
     {
-      groupName: 'Approvals & Requests',
+      groupName: 'Operational Workflows',
       items: [
-        { title: 'Complaints', href: '/warden/complaints', iconName: 'Wrench', badge: 2, badgeVariant: 'warning' },
-        { title: 'Gate Passes', href: '/warden/gate-passes', iconName: 'QrCode', badge: 4, badgeVariant: 'info' },
-        { title: 'Mess Menu & Feedback', href: '/warden/mess', iconName: 'Utensils' },
-      ],
-    },
-    {
-      groupName: 'System',
-      items: [
-        { title: 'Campus Calendar', href: '/warden/calendar', iconName: 'Calendar' },
-        { title: 'Notifications', href: '/warden/notifications', iconName: 'Bell' },
+        { title: 'Hostel Complaints', href: '/warden/complaints', iconName: 'Wrench' },
+        { title: 'Facility Assets', href: '/warden/facilities', iconName: 'Box' },
       ],
     },
   ],
