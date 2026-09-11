@@ -34,12 +34,11 @@ export class HealthService {
     const dbStatus = getDBStatus();
     const redisStatus = getRedisStatus();
 
-    const isHealthy = dbStatus.isConnected && redisStatus.isConnected;
-    const isDegraded = !isHealthy && (dbStatus.isConnected || redisStatus.isConnected);
-
     let status: 'healthy' | 'unhealthy' | 'degraded' = 'healthy';
-    if (!isHealthy) {
-      status = isDegraded ? 'degraded' : 'unhealthy';
+    if (!dbStatus.isConnected) {
+      status = 'unhealthy';
+    } else if (!redisStatus.isConnected) {
+      status = 'degraded';
     }
 
     return {

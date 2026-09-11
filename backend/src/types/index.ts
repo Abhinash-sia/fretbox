@@ -285,6 +285,27 @@ export interface ApiErrorResponse {
 
 export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
 
+export class ServiceUnavailableError extends AppError {
+  constructor(
+    message: string = 'Service temporarily unavailable',
+    code: string = 'SERVICE_UNAVAILABLE',
+  ) {
+    super(message, 503, code);
+  }
+}
+
+export class GatewayTimeoutError extends AppError {
+  constructor(message: string = 'Upstream service timed out', code: string = 'SERVICE_TIMEOUT') {
+    super(message, 504, code);
+  }
+}
+
+export class RequestTimeoutError extends AppError {
+  constructor(message: string = 'Request execution timed out', code: string = 'REQUEST_TIMEOUT') {
+    super(message, 408, code);
+  }
+}
+
 export interface AppConfig {
   NODE_ENV: 'development' | 'production' | 'test';
   PORT: number;
@@ -304,6 +325,10 @@ export interface AppConfig {
   PREDICTION_DEFAULT_HISTORY_DAYS?: number;
   PREDICTION_DEFAULT_HORIZON_DAYS?: number;
   PREDICTION_MAX_HORIZON_DAYS?: number;
+  REQUEST_TIMEOUT_MS?: number;
+  CACHE_DEFAULT_TTL_SECONDS?: number;
+  MAX_PAGE_SIZE?: number;
+  RETRY_MAX_ATTEMPTS?: number;
 }
 
 export interface JWTPayload {

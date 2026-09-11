@@ -58,6 +58,7 @@ export const getComplaints = async (req: Request, res: Response, next: NextFunct
       roomId: req.query.roomId as string,
       assetId: req.query.assetId as string,
       search: req.query.search as string,
+      updatedSince: req.query.updatedSince as string,
     };
 
     // Scoping for students

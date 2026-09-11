@@ -406,3 +406,23 @@ Admin JSON API Output ({ status, forecast, model, baseline, selectedModel })
 - **No Data Leakage**: Lags and rolling statistics are calculated strictly using past observations.
 - **Data Minimum Check**: Requires $\ge 30$ continuous daily observations (`status: "insufficient_data"` if sparse).
 - **Graceful Unavailability Fallback**: Returns `503 PREDICTION_SERVICE_UNAVAILABLE` without crashing Node backend if Python service is offline or times out (5000ms).
+
+---
+
+## Phase B11 — Accessibility & Resilience Architecture
+
+### 1. Request Timeout & Outbound Resiliency
+- **Global Request Timeout**: `requestTimeoutMiddleware` enforces a bounded request execution window (`REQUEST_TIMEOUT_MS=10000` default). If the server fails to complete a request within the deadline, it yields a standardized `408 REQUEST_TIMEOUT` error without crashing.
+- **Outbound HTTP Service Timeouts**: External/downstream requests (such as Python prediction or AI endpoints) use `AbortController` signal timeouts (`PREDICTION_SERVICE_TIMEOUT_MS=5000`) and map execution errors to controlled `503 SERVICE_UNAVAILABLE` or `504 SERVICE_TIMEOUT` status codes.
+
+### 2. Redis Degradation & Cache-Aside
+- **Safe Redis Infrastructure Wrappers**: `safeGetCache`, `safeSetCache`, `safeDeleteCache`, and `safeDeletePattern` wrap Redis operations. If Redis is disconnected, unreachable, or throwing errors, operations return `null` / `false` and log warnings while DB operations continue.
+- **Cache-Aside Pattern**: Read-heavy knowledge base (`GET /api/v1/ai/faq/documents`) checks Redis cache before querying MongoDB. On document creation/update/deletion, cache patterns (`faq:docs:*`) are invalidated.
+- **Health vs Readiness Semantics**:
+  - `GET /api/v1/health`: Checks process liveness (`status: 'ok'`, uptime, timestamp).
+  - `GET /api/v1/health/readiness`: Checks MongoDB (critical requirement). If MongoDB is disconnected, returns `503 Unhealthy`. If Redis is offline while MongoDB is healthy, status reports `degraded` with HTTP 200, allowing core application operations to continue.
+
+### 3. Query Resilience & Payload Compression
+- **Pagination Safeguards**: All list queries enforce an upper limit bound `Math.min(limit, 100)` to prevent unbounded document retrieval.
+- **Incremental Sync Support**: Read queries (such as `/api/v1/complaints`) support `updatedSince=<ISO_DATE>` query filters for lightweight delta sync by offline-aware clients.
+- **Response Compression**: Express `compression()` middleware compresses JSON responses above threshold sizes.

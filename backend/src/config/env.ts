@@ -28,6 +28,10 @@ export const envSchema = z.object({
   PREDICTION_DEFAULT_HISTORY_DAYS: z.coerce.number().default(180),
   PREDICTION_DEFAULT_HORIZON_DAYS: z.coerce.number().default(7),
   PREDICTION_MAX_HORIZON_DAYS: z.coerce.number().default(30),
+  REQUEST_TIMEOUT_MS: z.coerce.number().default(10000),
+  CACHE_DEFAULT_TTL_SECONDS: z.coerce.number().default(300),
+  MAX_PAGE_SIZE: z.coerce.number().default(100),
+  RETRY_MAX_ATTEMPTS: z.coerce.number().default(2),
 });
 
 /**

@@ -2,6 +2,11 @@ import { Types } from 'mongoose';
 import { FaqDocument, IFaqDocumentModel } from '../models/faqDocument.model.js';
 import { GeminiProvider } from '../../complaint-classification/providers/gemini.provider.js';
 import { FaqCategory, UserRole, NotFoundError } from '../../../../types/index.js';
+import {
+  safeGetCache,
+  safeSetCache,
+  safeDeletePattern,
+} from '../../../../infrastructure/redis/redis.js';
 
 export interface FaqQueryResult {
   answer: string;
@@ -201,13 +206,22 @@ export class FaqService {
     category?: FaqCategory,
     userRole?: UserRole,
   ): Promise<IFaqDocumentModel[]> {
+    const cacheKey = `faq:docs:${category || 'all'}:${userRole || 'all'}`;
+    const cached = await safeGetCache<IFaqDocumentModel[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const filter: Record<string, unknown> = {};
     if (category) filter.category = category;
     if (userRole && userRole !== UserRole.ADMINISTRATOR) {
       filter.isApproved = true;
       filter.$or = [{ targetRoles: { $size: 0 } }, { targetRoles: userRole }];
     }
-    return FaqDocument.find(filter).sort({ createdAt: -1 });
+    const docs = await FaqDocument.find(filter).sort({ createdAt: -1 });
+
+    await safeSetCache(cacheKey, docs, 300);
+    return docs;
   }
 
   public async createFaqDocument(data: {
@@ -219,7 +233,7 @@ export class FaqService {
     targetRoles?: UserRole[];
     createdById?: string;
   }): Promise<IFaqDocumentModel> {
-    return FaqDocument.create({
+    const doc = await FaqDocument.create({
       title: data.title.trim(),
       category: data.category || FaqCategory.GENERAL,
       content: data.content.trim(),
@@ -228,6 +242,9 @@ export class FaqService {
       targetRoles: data.targetRoles || [],
       createdById: data.createdById ? new Types.ObjectId(data.createdById) : undefined,
     });
+
+    await safeDeletePattern('faq:docs:*');
+    return doc;
   }
 
   public async updateFaqDocument(
@@ -254,6 +271,7 @@ export class FaqService {
     if (data.targetRoles !== undefined) doc.targetRoles = data.targetRoles;
 
     await doc.save();
+    await safeDeletePattern('faq:docs:*');
     return doc;
   }
 
@@ -262,5 +280,6 @@ export class FaqService {
     if (res.deletedCount === 0) {
       throw new NotFoundError('FAQ document not found', 'FAQ_NOT_FOUND');
     }
+    await safeDeletePattern('faq:docs:*');
   }
 }

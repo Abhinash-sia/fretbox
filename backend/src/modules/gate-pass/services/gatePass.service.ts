@@ -94,6 +94,9 @@ export class GatePassService {
   }
 
   public async getGatePassById(id: string): Promise<IGatePassDocument> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestError('Invalid gate pass ID format', 'INVALID_ID');
+    }
     const pass = await GatePass.findById(id).populate('studentId approvedBy', 'name email role');
     if (!pass) {
       throw new NotFoundError('Gate pass not found', 'GATE_PASS_NOT_FOUND');
@@ -102,6 +105,9 @@ export class GatePassService {
   }
 
   public async cancelGatePass(id: string, studentId: string): Promise<IGatePassDocument> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestError('Invalid gate pass ID format', 'INVALID_ID');
+    }
     const pass = await GatePass.findById(id);
     if (!pass) {
       throw new NotFoundError('Gate pass not found', 'GATE_PASS_NOT_FOUND');

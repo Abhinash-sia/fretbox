@@ -8,8 +8,15 @@ import { errorMiddleware } from './middlewares/error.middleware.js';
 import apiV1Router from './routes/index.js';
 import { getEnv } from './config/env.js';
 
+import compression from 'compression';
+import { requestTimeoutMiddleware } from './middlewares/timeout.middleware.js';
+
 export const createApp = (): Express => {
   const app = express();
+
+  // 0. Response Compression & Request Timeout
+  app.use(compression());
+  app.use(requestTimeoutMiddleware);
 
   // 1. Security Headers
   app.use(helmet());
@@ -30,7 +37,7 @@ export const createApp = (): Express => {
     max: 100, // Limit each IP to 100 requests per windowMs
     standardHeaders: true,
     legacyHeaders: false,
-    skip: () => env.NODE_ENV === 'test',
+    skip: (req) => env.NODE_ENV === 'test' || req.path.includes('/health'),
     message: {
       success: false,
       error: {

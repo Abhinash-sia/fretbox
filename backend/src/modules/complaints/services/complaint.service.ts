@@ -82,6 +82,7 @@ export class ComplaintService {
       roomId?: string;
       assetId?: string;
       search?: string;
+      updatedSince?: string;
     },
     page = 1,
     limit = 20,
@@ -96,6 +97,12 @@ export class ComplaintService {
     if (filterOptions.blockId) filter.blockId = filterOptions.blockId;
     if (filterOptions.roomId) filter.roomId = filterOptions.roomId;
     if (filterOptions.assetId) filter.assetId = filterOptions.assetId;
+    if (filterOptions.updatedSince) {
+      const sinceDate = new Date(filterOptions.updatedSince);
+      if (!isNaN(sinceDate.getTime())) {
+        filter.updatedAt = { $gte: sinceDate };
+      }
+    }
     if (filterOptions.search) {
       filter.$or = [
         { ticketNumber: { $regex: filterOptions.search, $options: 'i' } },
@@ -122,6 +129,9 @@ export class ComplaintService {
     assignments: unknown[];
     audits: unknown[];
   }> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestError('Invalid complaint ID format', 'INVALID_ID');
+    }
     const complaint = await Complaint.findById(id).populate(
       'studentId assignedToStaffId hostelId blockId roomId assetId',
     );

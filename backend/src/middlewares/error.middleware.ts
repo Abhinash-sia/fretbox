@@ -25,7 +25,6 @@ export const errorMiddleware = (
   }
 
   // 3. Unexpected / Unknown error
-  console.error('UNEXPECTED B8 TEST ERROR:', err);
   logger.error({ err }, 'Unexpected system error encountered');
 
   const isProduction = process.env.NODE_ENV === 'production';
