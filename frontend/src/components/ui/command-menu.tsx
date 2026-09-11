@@ -34,11 +34,12 @@ export function CommandMenu({ open, onOpenChange, onSelectAction }: CommandMenuP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg max-w-xl">
+      <DialogContent aria-label="Campus command palette" className="overflow-hidden p-0 shadow-lg max-w-xl">
         <CommandPrimitive className="flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground">
           <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
             <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
             <CommandPrimitive.Input
+              aria-label="Campus command palette search input"
               placeholder="Type a command or search campus records..."
               className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
             />

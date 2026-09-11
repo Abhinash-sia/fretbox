@@ -119,8 +119,9 @@ export function AppSidebar({ className }: AppSidebarProps) {
                   <Link
                     key={item.href}
                     href={item.href}
+                    aria-current={isActive ? 'page' : undefined}
                     className={cn(
-                      'group flex items-center justify-between rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors',
+                      'group flex items-center justify-between rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors min-h-[36px]',
                       isActive
                         ? 'bg-emerald-600 text-white font-semibold shadow-2xs'
                         : 'text-slate-300 hover:bg-[hsl(var(--sidebar-muted))] hover:text-white'

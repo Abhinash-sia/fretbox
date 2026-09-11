@@ -11,12 +11,17 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             staleTime: 1000 * 60 * 5, // 5 minutes
+            refetchOnReconnect: true,
+            refetchOnWindowFocus: false,
             retry: (failureCount, error: ApiClientError | unknown) => {
               if (error instanceof ApiClientError && (error.statusCode === 401 || error.statusCode === 403 || error.statusCode === 404)) {
                 return false;
               }
               return failureCount < 2;
             },
+          },
+          mutations: {
+            retry: false, // Strict safety: Never automatically retry mutations (payments, gate passes, complaints)
           },
         },
       })

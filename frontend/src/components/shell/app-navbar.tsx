@@ -94,8 +94,9 @@ export function AppNavbar({
         <Button
           variant="outline"
           size="sm"
+          aria-label="Ask Campus AI Assistant"
           onClick={() => openAiDrawer()}
-          className="h-8 gap-1.5 text-xs font-medium border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
+          className="h-8 gap-1.5 text-xs font-medium border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 transition-colors min-h-[36px]"
         >
           <Sparkles className="h-3.5 w-3.5 text-amber-500" />
           <span className="hidden md:inline">Ask Campus AI</span>
@@ -104,7 +105,8 @@ export function AppNavbar({
         {/* Command Search Trigger */}
         <button
           onClick={onOpenCommand}
-          className="hidden sm:flex items-center gap-2 rounded-md border border-input bg-muted/30 px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label="Open command palette search"
+          className="hidden sm:flex items-center gap-2 rounded-md border border-input bg-muted/30 px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground min-h-[36px]"
         >
           <Search className="h-3.5 w-3.5" />
           <span>Quick search or command...</span>
@@ -117,6 +119,7 @@ export function AppNavbar({
         <Button
           variant="ghost"
           size="icon"
+          aria-label="Toggle light and dark color theme"
           className="h-8 w-8 text-muted-foreground hover:text-foreground"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >

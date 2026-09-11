@@ -114,7 +114,7 @@ export function AiChatDrawer() {
         </SheetHeader>
 
         {/* 2. Chat Area */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div ref={scrollRef} aria-live="polite" className="flex-1 overflow-y-auto p-4 space-y-3">
           {/* Welcome Card & Starter Suggestions if no messages */}
           {messages.length === 0 && (
             <div className="space-y-4">

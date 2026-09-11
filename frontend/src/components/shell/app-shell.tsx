@@ -8,6 +8,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 import { AiDrawerProvider } from '@/features/ai/context/ai-drawer-context';
 import { AiChatDrawer } from '@/features/ai/components/ai-chat-drawer';
+import { OfflineBanner } from '@/components/ui/offline-banner';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -50,6 +51,9 @@ export function AppShell({ children }: AppShellProps) {
 
         {/* 5. Universal Campus AI Assistant Drawer */}
         <AiChatDrawer />
+
+        {/* 6. Accessible Global Offline Banner */}
+        <OfflineBanner />
       </div>
     </AiDrawerProvider>
   );
