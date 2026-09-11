@@ -1,4 +1,4 @@
-# Fretbox Backend Architecture — Phase B5 (Communication & Real-Time Domain)
+# Fretbox Backend Architecture — Phase B8 (Campus FAQ & RAG Domain)
 
 ## Architectural Overview
 
@@ -239,3 +239,43 @@ $$\text{attendancePercentage} = \frac{\text{present} + \text{late}}{\text{totalC
 - **Security**: Gate pass scan verification and gate audit log viewing.
 - **Staff**: Asset maintenance updates, complaint status resolution, and facility inspection.
 - **Student**: Gate pass application & cancellation, room allocation viewing (`/allocations/my`), complaint registration/self-management, mess menu viewing, and mess feedback submission.
+
+---
+
+## Phase B8 — Campus FAQ & RAG Architecture
+
+### 1. Grounded RAG Query Lifecycle
+```
+User Query (POST /api/v1/faq/query)
+        │
+        ▼
+Validation (Zod faqQuerySchema)
+        │
+        ▼
+FaqService.queryFaq()
+        │
+        ▼
+FaqService.retrieveRelevantDocuments()
+ ├── 1. MongoDB $text Search Index (title, content, tags)
+ ├── 2. Regex Keyword Fallback ($or / $and keywords)
+ └── 3. Role & Approval Scoping (isApproved: true, targetRoles)
+        │
+        ▼
+Grounding Check (If documents == [], return ungrounded fallback answer)
+        │
+        ▼
+GeminiProvider.answerFaqWithRag()
+ ├── Is GEMINI_API_KEY configured?
+ │     ├── YES ──► Prompt Gemini 2.5 Flash with structured JSON output schema (responseSchema)
+ │     └── NO  ──► Deterministic Fallback using top retrieved document content
+        │
+        ▼
+Validation & Formatting (Verify output, format response with sources & confidence score)
+```
+
+### 2. FAQ Knowledge Base Management (CRUD)
+- **FaqDocument Model**: MongoDB collection storing approved campus knowledge (`title`, `content`, `category`, `tags`, `isApproved`, `targetRoles`).
+- **Text Search Index**: Compound text index `{ title: 'text', content: 'text', tags: 'text' }` for fast keyword and semantic retrieval.
+- **Access Control**:
+  - `POST /api/v1/faq/documents` & `PATCH /api/v1/faq/documents/:id`: Restrictable to `ADMINISTRATOR` and `WARDEN`.
+  - `GET /api/v1/faq/query`: Open to authenticated users (`STUDENT`, `FACULTY`, `STAFF`, `WARDEN`, `ADMINISTRATOR`) with automatic role-based document scoping.

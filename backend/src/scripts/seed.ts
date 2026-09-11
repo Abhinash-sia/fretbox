@@ -25,9 +25,11 @@ import { GatePass } from '../models/gatePass.model.js';
 import { GateEvent } from '../models/gateEvent.model.js';
 import { Announcement } from '../models/announcement.model.js';
 import { Notification } from '../models/notification.model.js';
+import { FaqDocument } from '../models/faqDocument.model.js';
 import { passwordService } from '../services/password.service.js';
 import {
   UserRole,
+  FaqCategory,
   AttendanceStatus,
   SessionStatus,
   HostelCategory,
@@ -549,6 +551,41 @@ async function seed() {
       ]);
 
       logger.info('Seeded B5 Announcements & Notifications');
+    }
+
+    // 16. Seed Approved Campus FAQ Knowledge Documents
+    const faqCount = await FaqDocument.countDocuments();
+    if (faqCount === 0) {
+      await FaqDocument.create([
+        {
+          title: 'Hostel Curfew & Entry Rules',
+          category: FaqCategory.HOSTEL,
+          content:
+            'Hostel gates close at 10:00 PM for all undergraduate students. Students entering after 10:00 PM must present an approved late gate pass issued by their hostel warden.',
+          tags: ['hostel', 'curfew', 'timing', 'gate pass'],
+          isApproved: true,
+          targetRoles: [UserRole.STUDENT, UserRole.WARDEN],
+        },
+        {
+          title: 'Minimum Attendance Requirement Policy',
+          category: FaqCategory.ACADEMIC,
+          content:
+            'Students must maintain a minimum of 75% attendance in each enrolled course to be eligible to sit for the end-semester examinations. Medical excuses must be submitted within 3 working days.',
+          tags: ['attendance', 'academic', 'policy', 'exam'],
+          isApproved: true,
+          targetRoles: [UserRole.STUDENT, UserRole.FACULTY],
+        },
+        {
+          title: 'Mess Timings & Feedback System',
+          category: FaqCategory.MESS,
+          content:
+            'Mess operating hours: Breakfast 7:30 AM - 9:30 AM, Lunch 12:30 PM - 2:30 PM, Evening Snacks 5:00 PM - 6:00 PM, Dinner 7:30 PM - 9:30 PM. Daily feedback can be submitted via Fretbox app.',
+          tags: ['mess', 'timing', 'food', 'feedback'],
+          isApproved: true,
+          targetRoles: [UserRole.STUDENT],
+        },
+      ]);
+      logger.info('Seeded Approved Campus FAQ Knowledge Documents');
     }
 
     logger.info('Seed completed successfully! Log in using student@fretbox.demo / Password123!');

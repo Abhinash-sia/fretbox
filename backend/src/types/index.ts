@@ -161,6 +161,29 @@ export enum AnnouncementStatus {
   CANCELLED = 'cancelled',
 }
 
+export enum FaqCategory {
+  GENERAL = 'general',
+  ACADEMIC = 'academic',
+  HOSTEL = 'hostel',
+  FACILITIES = 'facilities',
+  GATE_PASS = 'gate_pass',
+  MESS = 'mess',
+  SECURITY = 'security',
+}
+
+export interface IFaqDocument {
+  _id?: string;
+  title: string;
+  category: FaqCategory;
+  content: string;
+  tags?: string[];
+  isApproved: boolean;
+  targetRoles?: UserRole[];
+  createdById?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export enum NotificationType {
   ANNOUNCEMENT = 'announcement',
   ATTENDANCE = 'attendance',

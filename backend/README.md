@@ -1,6 +1,6 @@
-# Fretbox Backend — Phase B3 (Operations Domain)
+# Fretbox Backend — Phase B8 (Campus FAQ / RAG Domain)
 
-Unified Campus Operations Platform — Backend Foundation, Authentication, RBAC, Academic Master Data, Attendance, Hostels, Facilities, Complaints, and Mess Management.
+Unified Campus Operations Platform — Backend Foundation, Authentication, RBAC, Academic Master Data, Attendance, Hostels, Facilities, Complaints, Mess Management, Gate Pass, Real-Time Communication, Admin Intelligence, AI Complaint Classification, and Campus FAQ / RAG Assistant.
 
 ## Tech Stack
 
@@ -184,3 +184,9 @@ Run `npm run seed` to populate demo accounts, academic data, hostels, blocks, ro
 - `GET /api/v1/communication/notifications/unread-count` - Get unread notification count
 - `PATCH /api/v1/communication/notifications/:id/read` - Mark notification as read (Idempotent, recipient-scoped)
 - `PATCH /api/v1/communication/notifications/:id/action` - Record notification action (Idempotent, recipient-scoped)
+
+### Campus FAQ & Retrieval-Augmented Generation (`/api/v1/faq`)
+- `POST /api/v1/faq/query` - Ask campus FAQ question and receive grounded AI answer with citations (All authenticated users)
+- `GET /api/v1/faq/documents` - List campus knowledge documents with category/role filtering (All authenticated users)
+- `POST /api/v1/faq/documents` - Create new campus knowledge document (Admin, Warden)
+- `PATCH /api/v1/faq/documents/:id` - Update existing campus knowledge document (Admin, Warden)
