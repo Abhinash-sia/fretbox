@@ -17,3 +17,6 @@ dist/
 *.swp
 .vscode/
 .idea/
+
+backend/scratch/
+backend/scratch/mongodb_data/
