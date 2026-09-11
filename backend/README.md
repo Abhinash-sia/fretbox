@@ -1,6 +1,6 @@
-# Fretbox Backend — Phase B2 (Academic + Attendance)
+# Fretbox Backend — Phase B3 (Operations Domain)
 
-Unified Campus Operations Platform — Backend Foundation, Authentication, RBAC, Academic Master Data, and Attendance Management.
+Unified Campus Operations Platform — Backend Foundation, Authentication, RBAC, Academic Master Data, Attendance, Hostels, Facilities, Complaints, and Mess Management.
 
 ## Tech Stack
 
@@ -29,13 +29,14 @@ Unified Campus Operations Platform — Backend Foundation, Authentication, RBAC,
 
 ---
 
-## Attendance Calculation Formula
+## Operations Domain Overview (Phase B3)
 
-$$\text{attendancePercentage} = \frac{\text{present} + \text{late}}{\text{totalConductedSessions}} \times 100$$
+Phase B3 introduces campus physical and operational management:
 
-- **Attended**: `present`, `late`
-- **Not Attended**: `absent`, `excused` (for percentage calculation)
-- **Low Attendance Threshold**: Default `75.0%` (configurable in `src/config/academic.config.ts`).
+1. **Hostel & Room Allocation System**: Hostels, blocks, rooms, occupied count tracking, auto status management (`AVAILABLE` / `FULL`), and single-active-allocation enforcement per student.
+2. **Facility Asset Management**: Infrastructure asset tracking with unique asset tags/codes, category classification, condition logging, and location association.
+3. **Complaint & Ticket Lifecycle**: Non-guessable ticket number generation (`FBX-YYYY-XXXXXX`), staff assignment, audit history logging, resolution time calculation (in minutes), metrics analytics (status, priority, ageing brackets), and recurring hotspot detection.
+4. **Mess Management & Student Feedback**: Daily/weekly meal menu publishing and 1-5 star student meal feedback submission with rating distribution analytics.
 
 ---
 
@@ -69,10 +70,10 @@ npm install
 # Run in development mode with live reloading
 npm run dev
 
-# Seed demo users, academic master data, and sample attendance sessions/records
+# Seed demo users, academic data, hostels, rooms, allocations, assets, complaints, mess menus & feedback
 npm run seed
 
-# Run unit and integration tests
+# Run unit and integration tests (63 tests across 18 suites passing)
 npm test
 
 # Check linting
@@ -90,9 +91,9 @@ npm run start
 
 ---
 
-## Seed Data (Development Accounts & Academic Data)
+## Seed Data (Development Accounts)
 
-Run `npm run seed` to populate demo accounts, department, program, academic year, semester, courses, class section, faculty assignments, student enrollments, and 4 sample attendance sessions for CS301.
+Run `npm run seed` to populate demo accounts, academic data, hostels, blocks, rooms, room allocations, facility assets, complaints with audit logs, mess menus, and student feedback.
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
@@ -117,29 +118,45 @@ Run `npm run seed` to populate demo accounts, department, program, academic year
 - `POST /api/v1/auth/logout` - Revoke refresh token session
 - `GET /api/v1/auth/me` - Authenticated user profile
 
-### Academic Master Data (`/api/v1/academic`)
-- `POST /api/v1/academic/departments` - Create department (Admin)
-- `GET /api/v1/academic/departments` - List departments
-- `POST /api/v1/academic/programs` - Create program (Admin)
-- `GET /api/v1/academic/programs` - List programs
-- `POST /api/v1/academic/years` - Create academic year (Admin)
-- `GET /api/v1/academic/years` - List academic years
-- `POST /api/v1/academic/semesters` - Create semester (Admin)
-- `GET /api/v1/academic/semesters` - List semesters
-- `POST /api/v1/academic/courses` - Create course (Admin)
-- `GET /api/v1/academic/courses` - List courses
-- `POST /api/v1/academic/sections` - Create class section (Admin)
-- `GET /api/v1/academic/sections` - List class sections
-- `POST /api/v1/academic/assignments` - Assign faculty to course/section (Admin)
-- `GET /api/v1/academic/assignments` - List faculty assignments
-- `POST /api/v1/academic/enrollments` - Enroll student in section (Admin)
-- `GET /api/v1/academic/enrollments` - List student enrollments
+### Academic Master Data & Attendance (`/api/v1/academic`)
+- Department, Program, Academic Year, Semester, Course, Section, Enrollment, Session, and Attendance Endpoints.
 
-### Attendance Management (`/api/v1/academic/attendance`)
-- `POST /api/v1/academic/attendance/sessions` - Create attendance session (Assigned Faculty / Admin)
-- `POST /api/v1/academic/attendance/sessions/:sessionId/records` - Mark attendance for students (Assigned Faculty / Admin)
-- `GET /api/v1/academic/attendance/student/:studentId` - View student attendance summary & low-attendance status (Student self-view / Faculty / Admin)
-- `GET /api/v1/academic/attendance/student/:studentId/course/:courseId` - View student course attendance summary
-- `GET /api/v1/academic/attendance/course/:courseId` - View course attendance overview (Faculty / Admin)
-- `PATCH /api/v1/academic/attendance/records/:recordId` - Correct attendance record with reason (Assigned Faculty / Admin)
-- `GET /api/v1/academic/attendance/records/:recordId/audit` - View attendance correction audit history
+### Hostels & Room Allocation (`/api/v1/hostels`)
+- `POST /api/v1/hostels` - Create hostel (Admin, Warden)
+- `GET /api/v1/hostels` - List hostels
+- `GET /api/v1/hostels/:id` - Get hostel details
+- `PATCH /api/v1/hostels/:id` - Update hostel (Admin, Warden)
+- `POST /api/v1/hostels/blocks` - Create hostel block (Admin, Warden)
+- `GET /api/v1/hostels/:hostelId/blocks` - List blocks by hostel
+- `POST /api/v1/hostels/rooms` - Create room (Admin, Warden)
+- `GET /api/v1/hostels/rooms/all` - List rooms
+- `POST /api/v1/hostels/allocations` - Allocate room to student (Admin, Warden)
+- `PATCH /api/v1/hostels/allocations/:id/vacate` - Vacate room allocation (Admin, Warden)
+- `GET /api/v1/hostels/allocations/my` - Get current student room allocation (Student)
+- `GET /api/v1/hostels/allocations` - List allocations (Admin, Warden, Staff)
+
+### Facility Assets (`/api/v1/facilities`)
+- `POST /api/v1/facilities` - Create asset (Admin, Warden, Staff)
+- `GET /api/v1/facilities` - List assets with search & filters
+- `GET /api/v1/facilities/:id` - Get asset details
+- `PATCH /api/v1/facilities/:id` - Update asset (Admin, Warden, Staff)
+- `DELETE /api/v1/facilities/:id` - Delete asset (Admin, Warden)
+
+### Maintenance Complaints (`/api/v1/complaints`)
+- `POST /api/v1/complaints` - Register complaint (All roles)
+- `GET /api/v1/complaints` - List complaints (Student scoped to own; Staff/Warden/Admin filter all)
+- `GET /api/v1/complaints/metrics` - Complaint analytics & resolution metrics (Admin, Warden, Staff)
+- `GET /api/v1/complaints/recurring` - Recurring issue hotspot detection (Admin, Warden, Staff)
+- `GET /api/v1/complaints/:id` - Get complaint details & audit trail
+- `PATCH /api/v1/complaints/:id/assign` - Assign complaint to staff (Admin, Warden)
+- `PATCH /api/v1/complaints/:id/status` - Update status (Self-ownership & role enforced)
+
+### Mess Management (`/api/v1/mess`)
+- `POST /api/v1/mess/menus` - Create meal menu (Admin, Warden)
+- `GET /api/v1/mess/menus` - List meal menus
+- `GET /api/v1/mess/menus/:id` - Get menu details
+- `PATCH /api/v1/mess/menus/:id` - Update meal menu (Admin, Warden)
+- `DELETE /api/v1/mess/menus/:id` - Delete meal menu (Admin, Warden)
+- `POST /api/v1/mess/menus/:id/feedback` - Submit meal rating & review (Student)
+- `GET /api/v1/mess/menus/:id/feedback/summary` - Get meal feedback summary & rating distribution
+- `GET /api/v1/mess/menus/:id/feedback` - List meal feedback reviews (Admin, Warden, Staff)

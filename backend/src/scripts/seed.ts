@@ -11,8 +11,33 @@ import { FacultyAssignment } from '../models/facultyAssignment.model.js';
 import { StudentEnrollment } from '../models/studentEnrollment.model.js';
 import { AttendanceSession } from '../models/attendanceSession.model.js';
 import { AttendanceRecord } from '../models/attendanceRecord.model.js';
+import { Hostel } from '../models/hostel.model.js';
+import { HostelBlock } from '../models/hostelBlock.model.js';
+import { Room } from '../models/room.model.js';
+import { StudentRoomAllocation } from '../models/studentRoomAllocation.model.js';
+import { FacilityAsset } from '../models/facilityAsset.model.js';
+import { Complaint } from '../models/complaint.model.js';
+import { ComplaintAssignment } from '../models/complaintAssignment.model.js';
+import { ComplaintAudit } from '../models/complaintAudit.model.js';
+import { MessMenu } from '../models/messMenu.model.js';
+import { MessFeedback } from '../models/messFeedback.model.js';
 import { passwordService } from '../services/password.service.js';
-import { UserRole, AttendanceStatus, SessionStatus } from '../types/index.js';
+import {
+  UserRole,
+  AttendanceStatus,
+  SessionStatus,
+  HostelCategory,
+  RoomStatus,
+  AllocationStatus,
+  AssetCategory,
+  AssetStatus,
+  AssetCondition,
+  ComplaintCategory,
+  ComplaintPriority,
+  ComplaintStatus,
+  ComplaintAuditAction,
+  MealType,
+} from '../types/index.js';
 import { logger } from '../config/logger.js';
 
 const seedUsers = [
@@ -61,7 +86,7 @@ const seedUsers = [
 ];
 
 async function seed() {
-  logger.info('Starting manual development seed script (B1 Auth + B2 Academic/Attendance)...');
+  logger.info('Starting manual development seed script (B0 + B1 + B2 + B3)...');
   const env = getEnv();
 
   try {
@@ -88,6 +113,10 @@ async function seed() {
     const facultyId = userMap.get('faculty@fretbox.demo')!;
     const student1Id = userMap.get('student@fretbox.demo')!;
     const student2Id = userMap.get('student2@fretbox.demo')!;
+    const staffId = userMap.get('staff@fretbox.demo')!;
+    const wardenId = userMap.get('warden@fretbox.demo')!;
+    const adminId = userMap.get('admin@fretbox.demo')!;
+    logger.info({ adminId }, 'Loaded Demo Admin ID');
 
     // 2. Department
     let dept = await Department.findOne({ code: 'CSE' });
@@ -101,280 +130,339 @@ async function seed() {
     }
 
     // 3. Program
-    let program = await Program.findOne({ code: 'BTECH-CSE' });
-    if (!program) {
-      program = await Program.create({
-        name: 'B.Tech Computer Science and Engineering',
-        code: 'BTECH-CSE',
+    let prog = await Program.findOne({ code: 'BTECH-CS' });
+    if (!prog) {
+      prog = await Program.create({
+        name: 'Bachelor of Technology in Computer Science',
+        code: 'BTECH-CS',
         departmentId: dept._id,
         durationYears: 4,
         isActive: true,
       });
-      logger.info('Seeded Program: BTECH-CSE');
+      logger.info('Seeded Program: BTECH-CS');
     }
 
     // 4. Academic Year
-    let acadYear = await AcademicYear.findOne({ name: '2026-27' });
+    let acadYear = await AcademicYear.findOne({
+      $or: [{ name: '2025-2026' }, { yearCode: '2025-2026' }],
+    });
     if (!acadYear) {
       acadYear = await AcademicYear.create({
-        name: '2026-27',
-        startDate: new Date('2026-08-01'),
-        endDate: new Date('2027-05-31'),
+        name: '2025-2026',
+        yearCode: '2025-2026',
+        startDate: new Date('2025-08-01'),
+        endDate: new Date('2026-05-31'),
         isCurrent: true,
       });
-      logger.info('Seeded Academic Year: 2026-27');
+      logger.info('Seeded Academic Year: 2025-2026');
     }
 
     // 5. Semester
-    let semester = await Semester.findOne({ academicYearId: acadYear._id, number: 1 });
-    if (!semester) {
-      semester = await Semester.create({
+    let sem = await Semester.findOne({
+      $or: [
+        { programId: prog._id, semesterNumber: 5 },
+        { academicYearId: acadYear._id, number: 5 },
+      ],
+    });
+    if (!sem) {
+      sem = await Semester.create({
         academicYearId: acadYear._id,
-        number: 1,
-        name: 'Fall 2026 Semester 1',
-        startDate: new Date('2026-08-01'),
-        endDate: new Date('2026-12-20'),
-        isCurrent: true,
-      });
-      logger.info('Seeded Semester: Fall 2026 Semester 1');
-    }
-
-    // 6. Courses
-    let course1 = await Course.findOne({ code: 'CS101', programId: program._id });
-    if (!course1) {
-      course1 = await Course.create({
-        code: 'CS101',
-        name: 'Introduction to Computer Science',
-        credits: 4,
-        semesterId: semester._id,
-        programId: program._id,
+        programId: prog._id,
+        semesterNumber: 5,
+        number: 5,
+        name: 'Semester 5',
+        startDate: new Date('2025-08-01'),
+        endDate: new Date('2025-12-20'),
         isActive: true,
       });
-      logger.info('Seeded Course: CS101');
+      logger.info('Seeded Semester 5');
     }
 
-    let course2 = await Course.findOne({ code: 'CS301', programId: program._id });
-    if (!course2) {
-      course2 = await Course.create({
-        code: 'CS301',
+    // 6. Course
+    let course = await Course.findOne({ code: 'CS501' });
+    if (!course) {
+      course = await Course.create({
+        code: 'CS501',
         name: 'Database Management Systems',
+        departmentId: dept._id,
+        programId: prog._id,
+        semesterId: sem._id,
         credits: 4,
-        semesterId: semester._id,
-        programId: program._id,
+        description: 'Relational databases, indexing, and SQL.',
         isActive: true,
       });
-      logger.info('Seeded Course: CS301');
+      logger.info('Seeded Course: CS501');
     }
 
     // 7. Class Section
-    let section = await ClassSection.findOne({ name: 'CSE-A', semesterId: semester._id });
+    let section = await ClassSection.findOne({ name: 'CS501-A' });
     if (!section) {
       section = await ClassSection.create({
-        name: 'CSE-A',
-        programId: program._id,
+        name: 'CS501-A',
+        courseId: course._id,
         academicYearId: acadYear._id,
-        semesterId: semester._id,
+        programId: prog._id,
+        semesterId: sem._id,
+        capacity: 60,
         isActive: true,
       });
-      logger.info('Seeded Class Section: CSE-A');
+      logger.info('Seeded Class Section: CS501-A');
     }
 
-    // 8. Faculty Assignments
-    let assignment1 = await FacultyAssignment.findOne({
+    // 8. Faculty Assignment
+    let facAssign = await FacultyAssignment.findOne({
       facultyId,
-      courseId: course1._id,
       classSectionId: section._id,
     });
-    if (!assignment1) {
-      await FacultyAssignment.create({
+    if (!facAssign) {
+      facAssign = await FacultyAssignment.create({
         facultyId,
-        courseId: course1._id,
-        classSectionId: section._id,
+        courseId: course._id,
+        semesterId: sem._id,
         academicYearId: acadYear._id,
-        semesterId: semester._id,
-        isActive: true,
-      });
-      logger.info('Seeded Faculty Assignment: Demo Faculty -> CS101 (CSE-A)');
-    }
-
-    let assignment2 = await FacultyAssignment.findOne({
-      facultyId,
-      courseId: course2._id,
-      classSectionId: section._id,
-    });
-    if (!assignment2) {
-      await FacultyAssignment.create({
-        facultyId,
-        courseId: course2._id,
         classSectionId: section._id,
-        academicYearId: acadYear._id,
-        semesterId: semester._id,
-        isActive: true,
+        role: 'primary',
       });
-      logger.info('Seeded Faculty Assignment: Demo Faculty -> CS301 (CSE-A)');
+      logger.info('Seeded Faculty Assignment');
     }
 
     // 9. Student Enrollments
-    let enrollment1 = await StudentEnrollment.findOne({
-      studentId: student1Id,
-      semesterId: semester._id,
-    });
-    if (!enrollment1) {
-      await StudentEnrollment.create({
+    let enrollIndex = 1;
+    for (const sId of [student1Id, student2Id]) {
+      let enroll = await StudentEnrollment.findOne({
+        studentId: sId,
+        classSectionId: section._id,
+      });
+      if (!enroll) {
+        enroll = await StudentEnrollment.create({
+          studentId: sId,
+          classSectionId: section._id,
+          academicYearId: acadYear._id,
+          semesterId: sem._id,
+          rollNumber: `CS202500${enrollIndex}`,
+          enrolledAt: new Date('2025-08-05'),
+        });
+      }
+      enrollIndex += 1;
+    }
+    logger.info('Seeded Student Enrollments');
+
+    // 10. Attendance Sessions & Records
+    let session = await AttendanceSession.findOne({ classSectionId: section._id });
+    if (!session) {
+      session = await AttendanceSession.create({
+        classSectionId: section._id,
+        courseId: course._id,
+        facultyId,
+        createdByFacultyId: facultyId,
+        date: new Date('2025-09-01'),
+        startTime: '09:00',
+        endTime: '10:00',
+        topic: 'Introduction to Normalization',
+        status: SessionStatus.COMPLETED,
+      });
+
+      await AttendanceRecord.create({
+        attendanceSessionId: session._id,
+        sessionId: session._id,
         studentId: student1Id,
-        classSectionId: section._id,
-        academicYearId: acadYear._id,
-        semesterId: semester._id,
-        rollNumber: '2026-CSE-001',
-        isActive: true,
+        status: AttendanceStatus.PRESENT,
+        markedBy: facultyId,
+        markedByFacultyId: facultyId,
       });
-      logger.info('Seeded Student Enrollment: Demo Student 1 -> CSE-A');
-    }
 
-    let enrollment2 = await StudentEnrollment.findOne({
-      studentId: student2Id,
-      semesterId: semester._id,
-    });
-    if (!enrollment2) {
-      await StudentEnrollment.create({
+      await AttendanceRecord.create({
+        attendanceSessionId: session._id,
+        sessionId: session._id,
         studentId: student2Id,
-        classSectionId: section._id,
-        academicYearId: acadYear._id,
-        semesterId: semester._id,
-        rollNumber: '2026-CSE-002',
+        status: AttendanceStatus.ABSENT,
+        markedBy: facultyId,
+        markedByFacultyId: facultyId,
+      });
+
+      logger.info('Seeded Attendance Session & Records');
+    }
+
+    // --- Phase B3 Operations Domain Seeding ---
+
+    // 11. Hostel
+    let hostel = await Hostel.findOne({ code: 'BHA' });
+    if (!hostel) {
+      hostel = await Hostel.create({
+        name: 'Boys Hostel A',
+        code: 'BHA',
+        category: HostelCategory.BOYS,
+        capacity: 100,
+        description: 'Main residential block for male engineering students',
         isActive: true,
       });
-      logger.info('Seeded Student Enrollment: Demo Student 2 -> CSE-A');
+      logger.info('Seeded Hostel: Boys Hostel A');
     }
 
-    // 10. Sample Attendance Sessions & Records for CS301
-    const existingSessions = await AttendanceSession.countDocuments({
-      courseId: course2._id,
-      classSectionId: section._id,
+    // 12. Hostel Block
+    let block = await HostelBlock.findOne({ hostelId: hostel._id, code: 'B1' });
+    if (!block) {
+      block = await HostelBlock.create({
+        hostelId: hostel._id,
+        name: 'Block 1',
+        code: 'B1',
+        floors: 3,
+        description: 'West Wing',
+        isActive: true,
+      });
+      logger.info('Seeded Hostel Block: Block 1');
+    }
+
+    // 13. Rooms
+    let room101 = await Room.findOne({ blockId: block._id, roomNumber: '101' });
+    if (!room101) {
+      room101 = await Room.create({
+        hostelId: hostel._id,
+        hostelBlockId: block._id,
+        blockId: block._id,
+        roomNumber: '101',
+        floor: 1,
+        floorNumber: 1,
+        capacity: 2,
+        occupiedCount: 1,
+        status: RoomStatus.AVAILABLE,
+      });
+      logger.info('Seeded Room: 101');
+    }
+
+    let room102 = await Room.findOne({ blockId: block._id, roomNumber: '102' });
+    if (!room102) {
+      room102 = await Room.create({
+        hostelId: hostel._id,
+        hostelBlockId: block._id,
+        blockId: block._id,
+        roomNumber: '102',
+        floor: 1,
+        floorNumber: 1,
+        capacity: 2,
+        occupiedCount: 0,
+        status: RoomStatus.AVAILABLE,
+      });
+      logger.info('Seeded Room: 102');
+    }
+
+    // 14. Room Allocation
+    let alloc = await StudentRoomAllocation.findOne({
+      studentId: student1Id,
+      status: AllocationStatus.ACTIVE,
     });
-
-    if (existingSessions === 0) {
-      // Session 1: Both Present
-      const sess1 = await AttendanceSession.create({
-        courseId: course2._id,
-        classSectionId: section._id,
-        facultyId,
-        date: new Date('2026-09-01'),
-        startTime: '09:00',
-        endTime: '10:00',
-        sessionNumber: 1,
-        topic: 'Introduction to Relational Databases',
-        status: SessionStatus.COMPLETED,
+    if (!alloc) {
+      alloc = await StudentRoomAllocation.create({
+        studentId: student1Id,
+        hostelId: hostel._id,
+        blockId: block._id,
+        roomId: room101._id,
+        allocatedByUserId: wardenId,
+        allocatedAt: new Date('2025-08-10'),
+        status: AllocationStatus.ACTIVE,
+        remarks: 'Semester 5 allocation',
       });
-
-      await AttendanceRecord.create([
-        {
-          attendanceSessionId: sess1._id,
-          studentId: student1Id,
-          status: AttendanceStatus.PRESENT,
-          markedBy: facultyId,
-        },
-        {
-          attendanceSessionId: sess1._id,
-          studentId: student2Id,
-          status: AttendanceStatus.PRESENT,
-          markedBy: facultyId,
-        },
-      ]);
-
-      // Session 2: Student 1 Late, Student 2 Present
-      const sess2 = await AttendanceSession.create({
-        courseId: course2._id,
-        classSectionId: section._id,
-        facultyId,
-        date: new Date('2026-09-03'),
-        startTime: '09:00',
-        endTime: '10:00',
-        sessionNumber: 2,
-        topic: 'ER Modeling and Normalization',
-        status: SessionStatus.COMPLETED,
-      });
-
-      await AttendanceRecord.create([
-        {
-          attendanceSessionId: sess2._id,
-          studentId: student1Id,
-          status: AttendanceStatus.LATE,
-          markedBy: facultyId,
-        },
-        {
-          attendanceSessionId: sess2._id,
-          studentId: student2Id,
-          status: AttendanceStatus.PRESENT,
-          markedBy: facultyId,
-        },
-      ]);
-
-      // Session 3: Student 1 Absent, Student 2 Present
-      const sess3 = await AttendanceSession.create({
-        courseId: course2._id,
-        classSectionId: section._id,
-        facultyId,
-        date: new Date('2026-09-05'),
-        startTime: '09:00',
-        endTime: '10:00',
-        sessionNumber: 3,
-        topic: 'SQL Queries and Joins',
-        status: SessionStatus.COMPLETED,
-      });
-
-      await AttendanceRecord.create([
-        {
-          attendanceSessionId: sess3._id,
-          studentId: student1Id,
-          status: AttendanceStatus.ABSENT,
-          markedBy: facultyId,
-        },
-        {
-          attendanceSessionId: sess3._id,
-          studentId: student2Id,
-          status: AttendanceStatus.PRESENT,
-          markedBy: facultyId,
-        },
-      ]);
-
-      // Session 4: Student 1 Absent, Student 2 Excused
-      const sess4 = await AttendanceSession.create({
-        courseId: course2._id,
-        classSectionId: section._id,
-        facultyId,
-        date: new Date('2026-09-08'),
-        startTime: '09:00',
-        endTime: '10:00',
-        sessionNumber: 4,
-        topic: 'Transactions and Indexing',
-        status: SessionStatus.COMPLETED,
-      });
-
-      await AttendanceRecord.create([
-        {
-          attendanceSessionId: sess4._id,
-          studentId: student1Id,
-          status: AttendanceStatus.ABSENT,
-          markedBy: facultyId,
-        },
-        {
-          attendanceSessionId: sess4._id,
-          studentId: student2Id,
-          status: AttendanceStatus.EXCUSED,
-          markedBy: facultyId,
-        },
-      ]);
-
-      logger.info('Seeded 4 Attendance Sessions and Records for CS301');
+      logger.info('Seeded Room Allocation for Student 1');
     }
 
-    logger.info('Academic and Attendance seed completed successfully.');
-  } catch (error) {
-    logger.error({ error }, 'Error running seed script');
+    // 15. Facility Assets
+    let asset = await FacilityAsset.findOne({ assetTag: 'WP-B1-F1' });
+    if (!asset) {
+      asset = await FacilityAsset.create({
+        name: 'RO Water Purifier',
+        assetCode: 'WP-B1-F1',
+        assetTag: 'WP-B1-F1',
+        category: AssetCategory.WATER,
+        locationType: 'block',
+        status: AssetStatus.ACTIVE,
+        condition: AssetCondition.GOOD,
+        hostelId: hostel._id,
+        blockId: block._id,
+        locationText: '1st Floor Common Corridor',
+        notes: 'Serviced in July 2025',
+      });
+      logger.info('Seeded Facility Asset: RO Water Purifier');
+    }
+
+    // 16. Complaint & Ticket Lifecycle
+    let complaint = await Complaint.findOne({ ticketNumber: 'FBX-2026-DEMO01' });
+    if (!complaint) {
+      complaint = await Complaint.create({
+        ticketNumber: 'FBX-2026-DEMO01',
+        studentId: student1Id,
+        title: 'Water filter leakage on 1st Floor',
+        description: 'RO Water filter WP-B1-F1 is leaking water on the floor.',
+        category: ComplaintCategory.PLUMBING,
+        priority: ComplaintPriority.HIGH,
+        status: ComplaintStatus.ASSIGNED,
+        hostelId: hostel._id,
+        blockId: block._id,
+        assetId: asset._id,
+        assignedToStaffId: staffId,
+        preferredTimeSlot: 'Morning 10 AM - 12 PM',
+      });
+
+      await ComplaintAssignment.create({
+        complaintId: complaint._id,
+        assignedToStaffId: staffId,
+        assignedByUserId: wardenId,
+        notes: 'Assigned to plumbing staff',
+        assignedAt: new Date(),
+        isActive: true,
+      });
+
+      await ComplaintAudit.create({
+        complaintId: complaint._id,
+        performedByUserId: student1Id,
+        action: ComplaintAuditAction.CREATED,
+        newStatus: ComplaintStatus.OPEN,
+        notes: 'Complaint registered by student',
+      });
+
+      await ComplaintAudit.create({
+        complaintId: complaint._id,
+        performedByUserId: wardenId,
+        action: ComplaintAuditAction.ASSIGNED,
+        previousStatus: ComplaintStatus.OPEN,
+        newStatus: ComplaintStatus.ASSIGNED,
+        newAssigneeId: staffId,
+        notes: 'Assigned to staff',
+      });
+
+      logger.info('Seeded Complaint FBX-2026-DEMO01 with audit trail');
+    }
+
+    // 17. Mess Menu & Feedback
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    let menu = await MessMenu.findOne({ date: today, mealType: MealType.BREAKFAST });
+    if (!menu) {
+      menu = await MessMenu.create({
+        hostelId: hostel._id,
+        date: today,
+        mealType: MealType.BREAKFAST,
+        items: ['Masala Dosa', 'Sambar', 'Coconut Chutney', 'Tea / Coffee'],
+        description: 'South Indian Breakfast',
+        isPublished: true,
+        createdByUserId: wardenId,
+      });
+
+      await MessFeedback.create({
+        menuId: menu._id,
+        studentId: student1Id,
+        rating: 5,
+        comments: 'Excellent dosa and hot coffee!',
+      });
+
+      logger.info('Seeded Mess Menu & Student Feedback');
+    }
+
+    logger.info('Seed completed successfully! Log in using student@fretbox.demo / Password123!');
+  } catch (err) {
+    logger.error({ err }, 'Error running seed script');
   } finally {
     await disconnectDB();
-    process.exit(0);
   }
 }
 

@@ -1,10 +1,10 @@
-# Fretbox Backend Architecture — Phase B2 (Academic + Attendance)
+# Fretbox Backend Architecture — Phase B3 (Operations Domain)
 
 ## Architectural Overview
 
-Fretbox backend follows a modular, layer-separated architecture designed for high scalability, testability, and clear domain boundaries.
+Fretbox backend follows a modular, layer-separated architecture designed for high scalability, testability, and clear domain boundaries across Academic and Operations domains.
 
-### Phase B2 Request Flow Diagram
+### Request Flow Diagram
 
 ```
 Client HTTP Request
@@ -25,15 +25,15 @@ RBAC Authorization Middleware (`authorize(...roles)`) ──► 403 Forbidden
 Route Handler & Zod Validation Middleware (`validate`)
     │
     ▼
-Controller Layer (`academic.controller.ts`)
+Controller Layer (`hostel.controller.ts`, `facility.controller.ts`, `complaint.controller.ts`, `mess.controller.ts`)
     │
     ▼
-Service Layer (`academic.service.ts`, `attendance.service.ts`)
+Service Layer (`hostel.service.ts`, `facility.service.ts`, `complaint.service.ts`, `mess.service.ts`)
     │
     ▼
-Mongoose Model Layer (`Department`, `Program`, `AcademicYear`, `Semester`, `Course`,
-                      `ClassSection`, `FacultyAssignment`, `StudentEnrollment`,
-                      `AttendanceSession`, `AttendanceRecord`, `AttendanceAudit`)
+Mongoose Model Layer (`Hostel`, `HostelBlock`, `Room`, `StudentRoomAllocation`,
+                      `FacilityAsset`, `Complaint`, `ComplaintAssignment`, `ComplaintAudit`,
+                      `MessMenu`, `MessFeedback`)
     │
     ▼
 MongoDB Database (`fretbox` database on localhost:27017)
@@ -41,81 +41,75 @@ MongoDB Database (`fretbox` database on localhost:27017)
 
 ---
 
-## Academic Domain Entity Relationships
+## Phase B3 Operations Domain Architecture
 
+### 1. Hostel & Room Allocation System
 ```
-Department
+Hostel ──► HostelBlock ──► Room ──► StudentRoomAllocation ◄── Student User
+```
+- **Capacity Rules**: Room capacity constraints are strictly enforced server-side. Occupied count increments upon active allocation and decrements upon vacate. Room status automatically switches between `AVAILABLE` and `FULL`.
+- **Double Allocation Prevention**: Students can have at most one `ACTIVE` room allocation at any time.
+
+### 2. Facility Asset Management
+```
+FacilityAsset (assetTag / assetCode) ──► Hostel / Block / Room / Common
+```
+- Assets represent campus equipment and infrastructure. Location types (`hostel`, `block`, `room`, `common`) link assets to dynamic campus physical locations.
+
+### 3. Complaint Management & Ticket Lifecycle
+```
+Complaint Registration (FBX-YYYY-XXXXXX)
     │
     ▼
-Program
-    │
-    ├──────────────► Course
+Assign Staff (ComplaintAssignment + Audit Log)
     │
     ▼
-Class Section
+In Progress / Resolution (ComplaintAudit)
     │
-    ├──────────────► Student Enrollment
-    │
-    └──────────────► Faculty Assignment
-                         │
-                         ▼
-                  Attendance Session
-                         │
-                         ▼
-                  Attendance Record ──► Attendance Audit
-                         │
-                         ▼
-                 Attendance Summary & Low-Attendance Detection
+    ▼
+Resolved (Resolution Time Calculation) ──► Closed or Reopened
 ```
+
+#### Status Transition Rules
+- `OPEN` ──► `ASSIGNED`, `IN_PROGRESS`, `RESOLVED`
+- `ASSIGNED` ──► `IN_PROGRESS`, `RESOLVED`
+- `IN_PROGRESS` ──► `RESOLVED`
+- `RESOLVED` ──► `CLOSED`, `REOPENED`
+- `CLOSED` ──► `REOPENED`
+
+#### Resolution Time Formula
+$$\text{resolutionTimeMinutes} = \text{round}\left( \frac{\text{resolvedAt} - \text{createdAt}}{1000 \times 60} \right)$$
+
+#### Recurring Issue Detection
+Aggregates maintenance complaint frequencies grouped by location (`hostelId`, `blockId`, `roomId`) or asset over configurable thresholds (default $\ge 3$) to identify facility bottlenecks.
+
+### 4. Mess Management & Student Feedback
+```
+MessMenu (Hostel/Date/MealType) ──► MessFeedback (Student Rating 1-5 + Comments)
+                                        │
+                                        ▼
+                            Mess Feedback Summary & Analytics
+```
+- Allows wardens to post daily/weekly meal menus.
+- Enables students to rate meals (1-5 stars) with comments, aggregating average ratings and rating distributions.
 
 ---
 
-## Attendance Calculation & Business Rules
+## Attendance Calculation & Business Rules (Phase B2 Foundation)
 
-### Official Attendance Calculation Formula
-
+### Attendance Calculation Formula
 $$\text{attendancePercentage} = \frac{\text{present} + \text{late}}{\text{totalConductedSessions}} \times 100$$
 
 - `present` = **attended**
 - `late` = **attended**
 - `absent` = **not attended**
-- `excused` = **not attended** for the percentage calculation
-
-> [!IMPORTANT]
-> The backend calculates attendance dynamically from persisted attendance records using MongoDB aggregations. Percentage values are never accepted directly from client request payloads.
-
-### Configurable Low-Attendance Threshold
-- Centralized configuration in `src/config/academic.config.ts`.
-- **Default Threshold**: `75.0%`.
-- **Low Attendance Flag**: If `percentage < 75.0%`, `isLowAttendance` evaluates to `true`.
+- `excused` = **not attended** for percentage calculation
 
 ---
 
-## Authorization Boundaries
+## Authorization Boundaries (RBAC)
 
-- **Administrator**: Full CRUD access to academic master data (departments, programs, academic years, semesters, courses, sections, faculty assignments, student enrollments) and oversight of all attendance data.
-- **Faculty**:
-  - Can create attendance sessions ONLY for courses & class sections where they have an active `FacultyAssignment`.
-  - Can mark attendance ONLY for students enrolled in that class section (`StudentEnrollment`).
-  - Can correct attendance records for their assigned sessions with a mandatory reason log.
-- **Student**:
-  - Can view ONLY their own academic information and attendance summary.
-  - Server-side self-ownership check (`req.user.id === studentId`). Accessing another student's attendance returns `403 Forbidden` (`ACADEMIC_FORBIDDEN`).
-- **Unrelated Roles (Warden, Security, Staff)**: Denied access to academic management (`403 Forbidden`).
-
----
-
-## Correction Workflow & Audit Trail
-
-Attendance modification follows a strict non-destructive audit policy:
-1. `AttendanceRecord` status is updated and `markedBy` is updated to the correcting user ID.
-2. An immutable `AttendanceAudit` record is created storing:
-   - `attendanceRecordId`
-   - `studentId`
-   - `attendanceSessionId`
-   - `previousStatus`
-   - `newStatus`
-   - `changedBy`
-   - `reason`
-   - `changedAt`
-3. Audit logs can be retrieved via `GET /api/v1/academic/attendance/records/:recordId/audit`.
+- **Administrator**: Full system access across academic and campus operations domains.
+- **Warden**: Full management over hostels, blocks, room allocations, complaint assignments, and mess menus.
+- **Staff**: Asset maintenance updates, complaint status resolution, and facility inspection.
+- **Student**: Room allocation viewing (`/allocations/my`), complaint registration/self-management, mess menu viewing, and mess feedback submission.

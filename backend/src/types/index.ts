@@ -20,6 +20,98 @@ export enum SessionStatus {
   CANCELLED = 'cancelled',
 }
 
+export enum HostelCategory {
+  BOYS = 'boys',
+  GIRLS = 'girls',
+  COED = 'coed',
+}
+
+export enum RoomStatus {
+  AVAILABLE = 'available',
+  FULL = 'full',
+  MAINTENANCE = 'maintenance',
+  INACTIVE = 'inactive',
+}
+
+export enum AllocationStatus {
+  ACTIVE = 'active',
+  VACATED = 'vacated',
+}
+
+export enum AssetCategory {
+  ELECTRICAL = 'electrical',
+  PLUMBING = 'plumbing',
+  CLEANLINESS = 'cleanliness',
+  ROOM = 'room',
+  FURNITURE = 'furniture',
+  NETWORK = 'network',
+  WATER = 'water',
+  APPLIANCE = 'appliance',
+  SAFETY = 'safety',
+  OTHER = 'other',
+}
+
+export enum AssetStatus {
+  ACTIVE = 'active',
+  MAINTENANCE = 'maintenance',
+  DAMAGED = 'damaged',
+  RETIRED = 'retired',
+}
+
+export enum AssetCondition {
+  GOOD = 'good',
+  FAIR = 'fair',
+  POOR = 'poor',
+  CRITICAL = 'critical',
+}
+
+export enum ComplaintCategory {
+  ELECTRICAL = 'electrical',
+  PLUMBING = 'plumbing',
+  CLEANLINESS = 'cleanliness',
+  ROOM = 'room',
+  FURNITURE = 'furniture',
+  NETWORK = 'network',
+  WATER = 'water',
+  MESS = 'mess',
+  SECURITY = 'security',
+  OTHER = 'other',
+}
+
+export enum ComplaintPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  URGENT = 'urgent',
+}
+
+export enum ComplaintStatus {
+  OPEN = 'open',
+  ASSIGNED = 'assigned',
+  IN_PROGRESS = 'in_progress',
+  RESOLVED = 'resolved',
+  CLOSED = 'closed',
+  REOPENED = 'reopened',
+}
+
+export enum ComplaintAuditAction {
+  CREATED = 'created',
+  ASSIGNED = 'assigned',
+  REASSIGNED = 'reassigned',
+  STATUS_CHANGED = 'status_changed',
+  PRIORITY_CHANGED = 'priority_changed',
+  RESOLVED = 'resolved',
+  CLOSED = 'closed',
+  REOPENED = 'reopened',
+}
+
+export enum MealType {
+  BREAKFAST = 'breakfast',
+  LUNCH = 'lunch',
+  SNACKS = 'snacks',
+  DINNER = 'dinner',
+}
+
 export class AppError extends Error {
   public readonly statusCode: number;
   public readonly code: string;
@@ -155,6 +247,19 @@ export interface StudentAttendanceSummary {
     threshold: number;
   };
   courses: CourseAttendanceSummary[];
+}
+
+export interface MessFeedbackSummary {
+  menuId: string;
+  averageRating: number;
+  totalFeedbackCount: number;
+  ratingDistribution: {
+    1: number;
+    2: number;
+    3: number;
+    4: number;
+    5: number;
+  };
 }
 
 declare global {
