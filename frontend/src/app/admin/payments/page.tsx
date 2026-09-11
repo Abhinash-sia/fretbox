@@ -6,15 +6,15 @@ import { AppShell } from '@/components/shell/app-shell';
 import { PageHeader } from '@/components/ui/page-header';
 import { PaymentsDashboard } from '@/features/payments/components/payments-dashboard';
 
-export default function StudentFeesPage() {
+export default function AdminPaymentsPage() {
   return (
-    <ProtectedRoute allowedRoles={['student']}>
+    <ProtectedRoute allowedRoles={['administrator']}>
       <AppShell>
         <PageHeader
-          heading="Student Fees & Payment Records"
-          subheading="Tuition fees, hostel dues, fee breakdowns, and verified transaction receipts."
+          heading="Campus Financial Ledger & Fee Collection"
+          subheading="Campus fee dues, payment collection status, and Razorpay gateway compliance overview."
         />
-        <PaymentsDashboard role="student" />
+        <PaymentsDashboard role="administrator" />
       </AppShell>
     </ProtectedRoute>
   );
