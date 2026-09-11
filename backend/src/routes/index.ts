@@ -8,6 +8,8 @@ import complaintRoutes from './complaint.routes.js';
 import messRoutes from './mess.routes.js';
 import gatePassRoutes from './gatePass.routes.js';
 import gateEventRoutes from './gateEvent.routes.js';
+import communicationRoutes from './communication.routes.js';
+import analyticsRoutes from './analytics.routes.js';
 
 const apiV1Router = Router();
 
@@ -21,5 +23,7 @@ apiV1Router.use('/complaints', complaintRoutes);
 apiV1Router.use('/mess', messRoutes);
 apiV1Router.use('/gate-passes', gatePassRoutes);
 apiV1Router.use('/gate-events', gateEventRoutes);
+apiV1Router.use('/communication', communicationRoutes);
+apiV1Router.use('/admin/analytics', analyticsRoutes);
 
 export default apiV1Router;

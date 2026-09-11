@@ -126,6 +126,34 @@ export enum GateEventType {
   ENTRY = 'entry',
 }
 
+export enum AnnouncementPriority {
+  LOW = 'low',
+  NORMAL = 'normal',
+  HIGH = 'high',
+  URGENT = 'urgent',
+}
+
+export enum AnnouncementStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  EXPIRED = 'expired',
+  CANCELLED = 'cancelled',
+}
+
+export enum NotificationType {
+  ANNOUNCEMENT = 'announcement',
+  ATTENDANCE = 'attendance',
+  COMPLAINT = 'complaint',
+  GATE_PASS = 'gate_pass',
+  SYSTEM = 'system',
+}
+
+export enum NotificationDeliveryStatus {
+  PENDING = 'pending',
+  DELIVERED = 'delivered',
+  FAILED = 'failed',
+}
+
 export class AppError extends Error {
   public readonly statusCode: number;
   public readonly code: string;
@@ -274,6 +302,25 @@ export interface MessFeedbackSummary {
     4: number;
     5: number;
   };
+}
+
+export interface AnnouncementTarget {
+  all?: boolean;
+  roles?: UserRole[];
+  programs?: string[];
+  academicYears?: string[];
+  hostels?: string[];
+  hostelBlocks?: string[];
+}
+
+export interface AnnouncementStats {
+  totalRecipients: number;
+  deliveredCount: number;
+  pendingCount: number;
+  failedCount: number;
+  readCount: number;
+  actionCount: number;
+  readPercentage: number;
 }
 
 declare global {

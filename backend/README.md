@@ -171,3 +171,16 @@ Run `npm run seed` to populate demo accounts, academic data, hostels, blocks, ro
 - `POST /api/v1/gate-passes/scan` - Security QR scan & atomic pass consumption (Security, Admin)
 - `GET /api/v1/gate-events` - List security gate scan audit events (Security, Warden, Admin)
 - `GET /api/v1/gate-events/:id` - Get gate scan event details (Security, Warden, Admin)
+
+### Communication & Real-Time (`/api/v1/communication`)
+- `POST /api/v1/communication/announcements` - Create draft announcement (Admin, Warden)
+- `GET /api/v1/communication/announcements` - List announcements (Role-aware filtering)
+- `GET /api/v1/communication/announcements/:id` - Get announcement details
+- `PATCH /api/v1/communication/announcements/:id` - Update draft announcement (Admin, Warden)
+- `POST /api/v1/communication/announcements/:id/publish` - Publish announcement & trigger notification generation (Admin, Warden)
+- `POST /api/v1/communication/announcements/:id/cancel` - Cancel announcement (Admin, Warden)
+- `GET /api/v1/communication/announcements/:id/stats` - Inspect announcement delivery & read analytics (Admin, Warden)
+- `GET /api/v1/communication/notifications` - List notifications for current user (Recipient-scoped)
+- `GET /api/v1/communication/notifications/unread-count` - Get unread notification count
+- `PATCH /api/v1/communication/notifications/:id/read` - Mark notification as read (Idempotent, recipient-scoped)
+- `PATCH /api/v1/communication/notifications/:id/action` - Record notification action (Idempotent, recipient-scoped)

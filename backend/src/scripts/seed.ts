@@ -23,6 +23,8 @@ import { MessMenu } from '../models/messMenu.model.js';
 import { MessFeedback } from '../models/messFeedback.model.js';
 import { GatePass } from '../models/gatePass.model.js';
 import { GateEvent } from '../models/gateEvent.model.js';
+import { Announcement } from '../models/announcement.model.js';
+import { Notification } from '../models/notification.model.js';
 import { passwordService } from '../services/password.service.js';
 import {
   UserRole,
@@ -41,6 +43,10 @@ import {
   MealType,
   GatePassStatus,
   GateEventType,
+  AnnouncementPriority,
+  AnnouncementStatus,
+  NotificationType,
+  NotificationDeliveryStatus,
 } from '../types/index.js';
 import { logger } from '../config/logger.js';
 
@@ -504,6 +510,45 @@ async function seed() {
       });
 
       logger.info('Seeded Gate Passes & Gate Event');
+    }
+
+    // 10. B5 Announcements & Notifications
+    let announcement1 = await Announcement.findOne({ title: 'End Semester Exam Timetable' });
+    if (!announcement1 && adminId && student1Id) {
+      announcement1 = await Announcement.create({
+        title: 'End Semester Exam Timetable',
+        body: 'The end semester examination schedule has been published on the campus portal.',
+        createdBy: adminId,
+        target: { all: true },
+        priority: AnnouncementPriority.HIGH,
+        status: AnnouncementStatus.PUBLISHED,
+        publishedAt: new Date(),
+      });
+
+      await Notification.create([
+        {
+          recipientId: student1Id,
+          announcementId: announcement1._id,
+          type: NotificationType.ANNOUNCEMENT,
+          title: 'End Semester Exam Timetable',
+          body: 'The end semester examination schedule has been published on the campus portal.',
+          priority: AnnouncementPriority.HIGH,
+          deliveryStatus: NotificationDeliveryStatus.DELIVERED,
+          deliveredAt: new Date(),
+          readAt: new Date(),
+        },
+        {
+          recipientId: student2Id,
+          announcementId: announcement1._id,
+          type: NotificationType.ANNOUNCEMENT,
+          title: 'End Semester Exam Timetable',
+          body: 'The end semester examination schedule has been published on the campus portal.',
+          priority: AnnouncementPriority.HIGH,
+          deliveryStatus: NotificationDeliveryStatus.PENDING,
+        },
+      ]);
+
+      logger.info('Seeded B5 Announcements & Notifications');
     }
 
     logger.info('Seed completed successfully! Log in using student@fretbox.demo / Password123!');

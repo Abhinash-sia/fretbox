@@ -4,6 +4,7 @@ import { getEnv } from './config/env.js';
 import { logger } from './config/logger.js';
 import { connectDB, disconnectDB } from './config/db.js';
 import { connectRedis, disconnectRedis } from './config/redis.js';
+import { initRealtimeServer, closeRealtimeServer } from './services/realtime.service.js';
 
 let server: Server | null = null;
 let isShuttingDown = false;
@@ -29,6 +30,9 @@ const startServer = async (): Promise<void> => {
         `Server running on http://localhost:${env.PORT}/api/v1/health`,
       );
     });
+
+    // 4. Initialize Socket.IO Realtime Service
+    initRealtimeServer(server);
   } catch (error) {
     logger.fatal({ error }, 'Failed to start application server');
     process.exit(1);
@@ -51,7 +55,10 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
   }, 10000);
 
   try {
-    // 1. Stop HTTP Server (stop receiving new requests)
+    // 1. Close Realtime Socket.IO Server
+    await closeRealtimeServer();
+
+    // 2. Stop HTTP Server (stop receiving new requests)
     if (server) {
       await new Promise<void>((resolve, reject) => {
         server!.close((err) => {

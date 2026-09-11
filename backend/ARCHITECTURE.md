@@ -1,22 +1,22 @@
-# Fretbox Backend Architecture — Phase B4 (Gate Pass & Security Domain)
+# Fretbox Backend Architecture — Phase B5 (Communication & Real-Time Domain)
 
 ## Architectural Overview
 
-Fretbox backend follows a modular, layer-separated architecture designed for high scalability, testability, and clear domain boundaries across Academic, Operations, and Gate Pass/Security domains.
+Fretbox backend follows a modular, layer-separated architecture designed for high scalability, testability, and clear domain boundaries across Academic, Operations, Gate Pass/Security, and Communication/Real-Time domains.
 
 ### Request Flow Diagram
 
 ```
-Client HTTP Request
+Client HTTP Request / Socket.IO Connection
     │
     ▼
-Express Framework (`app.ts`)
+Express Framework (`app.ts`) + Socket.IO Server (`realtime.service.ts`)
     │
     ▼
 Global Middlewares (Helmet, CORS, Baseline & Auth Rate Limiters, Pino Logger)
     │
     ▼
-Authentication Middleware (`authenticate`) ──► 401 Unauthorized
+Authentication Middleware (`authenticate` / Socket JWT Handshake) ──► 401 Unauthorized
     │
     ▼
 RBAC Authorization Middleware (`authorize(...roles)`) ──► 403 Forbidden
@@ -25,17 +25,76 @@ RBAC Authorization Middleware (`authorize(...roles)`) ──► 403 Forbidden
 Route Handler & Zod Validation Middleware (`validate`)
     │
     ▼
-Controller Layer (`gatePass.controller.ts`, `gateEvent.controller.ts`, `hostel.controller.ts`, `complaint.controller.ts`, etc.)
+Controller Layer (`communication.controller.ts`, `gatePass.controller.ts`, `hostel.controller.ts`, etc.)
     │
     ▼
-Service Layer (`gatePass.service.ts`, `gateEvent.service.ts`, `hostel.service.ts`, etc.)
+Service Layer (`announcement.service.ts`, `audience.service.ts`, `notification.service.ts`, `realtime.service.ts`, etc.)
     │
     ▼
-Mongoose Model Layer (`GatePass`, `GateEvent`, `Hostel`, `Room`, `Complaint`, `User`, etc.)
+Mongoose Model Layer (`Announcement`, `Notification`, `GatePass`, `Hostel`, `User`, etc.)
     │
     ▼
 MongoDB Database (`fretbox` database on localhost:27017)
 ```
+
+---
+
+## Phase B5 Communication & Real-Time Domain Architecture
+
+### 1. System Communication Flow & Data Model
+```
+                    ┌───────────────┐
+                    │ Administrator │
+                    └───────┬───────┘
+                            │
+                            ▼
+                    Create Announcement (DRAFT)
+                            │
+                            ▼
+                    Target Resolution (AudienceService)
+                            │
+                            ▼
+                    Persistent Notifications (MongoDB)
+                            │
+               ┌────────────┴────────────┐
+               ▼                         ▼
+          MongoDB                    Socket.IO
+        (Source of Truth)        (Realtime Dispatch)
+               │                         │
+               │                         ▼
+               │                  Connected Clients (user:<userId> room)
+               │
+               ▼
+       Read / Action Tracking
+               │
+               ▼
+       Analytics & Stats
+```
+
+### 2. Announcement Lifecycle
+```
+DRAFT ──► PUBLISHED ──► EXPIRED
+  │           │
+  ▼           ▼
+CANCELLED  CANCELLED
+```
+- Only `PUBLISHED` announcements resolve audience targets and trigger notification generation.
+- Re-publishing an already published announcement is an **idempotent no-op**.
+
+### 3. Notification Idempotency Strategy
+Database-level uniqueness is enforced to prevent duplicate notifications:
+```typescript
+notificationSchema.index(
+  { recipientId: 1, announcementId: 1, type: 1 },
+  { unique: true, partialFilterExpression: { announcementId: { $type: 'objectId' } } }
+);
+```
+Bulk creation executes with `{ ordered: false }` to gracefully handle duplicate key collisions.
+
+### 4. Realtime Socket.IO & Offline Semantics
+- **Socket Authentication**: Authenticated using verified JWT access tokens passed in handshakes. Attaches `{ id, role }` identity to socket.
+- **User & Role Rooms**: Socket joins `user:<userId>` and `role:<role>`.
+- **Durable Source of Truth**: MongoDB is authoritative. If a user is offline, notifications remain persisted with `deliveryStatus: 'pending'`. When reconnecting, clients retrieve unread notifications via REST API (`GET /api/v1/communication/notifications?unreadOnly=true`).
 
 ---
 
